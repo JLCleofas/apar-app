@@ -41,12 +41,16 @@ class ProjectRequest(BaseModel):
     fully_paid: bool
 
 ### Pages ###
-@router.get("/ap-page")
+@router.get("/projects")
 async def render_ap_page(request: Request, db: db_dependency):
     projects = db.query(AccountsPayable).all()
 
     return templates.TemplateResponse("accounts-payable.html", {"request": request, "projects": projects})
 
+@router.get("/details/{project_id}")
+async def render_project_details(request: Request, db: db_dependency, project_id: int):
+    project_model = db.query(AccountsPayable).filter(AccountsPayable.id == project_id).first()
+    return templates.TemplateResponse("ap-details.html", {"request": request, "project": project_model})
 
 ### Endpoints ###
 @router.get("/", status_code=status.HTTP_200_OK)

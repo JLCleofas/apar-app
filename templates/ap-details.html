@@ -1,0 +1,173 @@
+{% extends 'base.html' %} {% block content %}
+<div class="container">
+  <div class="card">
+    <div class="card-header">Project Details</div>
+    <div class="card-body">
+      <form action="">
+        <div class="row">
+          <div class="col">
+            <label for="">Project Name</label>
+            <input
+              type="text"
+              class="form-control"
+              value="{{ project.project_name }}"
+              name=""
+              id=""
+              disabled
+            />
+          </div>
+          <div class="col">
+            <label for="">Quotation Number</label>
+            <input
+              type="text"
+              class="form-control"
+              value="{{ project.quotation }}"
+              name=""
+              id=""
+              disabled
+            />
+          </div>
+          <div class="col">
+            <label for="">Acceptance Number</label>
+            <input
+              type="text"
+              class="form-control"
+              value="{{ project.acceptance }}"
+              name=""
+              id=""
+              disabled
+            />
+          </div>
+          <div class="col">
+            <label for="">Vendor Purchase Order</label>
+            <input
+              type="text"
+              class="form-control"
+              value="{{ project.vendor_po }}"
+              name=""
+              id=""
+              disabled
+            />
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <label for="">Supplier</label>
+            <input
+              type="text"
+              class="form-control"
+              value="{{ project.supplier }}"
+              name=""
+              id=""
+              disabled
+            />
+          </div>
+          <div class="col">
+            <label for="">Document Type</label>
+            <input
+              type="text"
+              class="form-control"
+              value="{{ project.document_type }}"
+              name=""
+              id=""
+              disabled
+            />
+          </div>
+          <div class="col">
+            <label for="">Invoice Number</label>
+            <input
+              type="text"
+              class="form-control"
+              value="{{ project.invoice_number }}"
+              name=""
+              id=""
+              disabled
+            />
+          </div>
+          <div class="col">
+            <label for="">Date Paid</label>
+            <input
+              type="text"
+              class="form-control"
+              value="{{ project.date_paid }}"
+              name=""
+              id=""
+              disabled
+            />
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <label for="">DV Reference</label>
+            <input
+              type="text"
+              class="form-control"
+              value="{{ project.dv_reference }}"
+              name=""
+              id=""
+              disabled
+            />
+          </div>
+          <div class="col">
+            <label for="">Currency</label>
+            <input
+              type="text"
+              class="form-control"
+              value="{{ project.currency }}"
+              name=""
+              id=""
+              disabled
+            />
+          </div>
+          <div class="col">
+            <label for="">Purchase Order Amount</label>
+            <input
+              type="text"
+              class="form-control"
+              value="{{ project.po_amount }}"
+              name=""
+              id=""
+              disabled
+            />
+          </div>
+          <div class="col">
+            <label for="">Invoice Amount</label>
+            <input
+              type="text"
+              class="form-control"
+              value="{{ project.invoice_amount }}"
+              name=""
+              id=""
+              disabled
+            />
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <label for="">Fully Paid</label>
+            <input
+              type="text"
+              class="form-control"
+              value="{{ project.fully_paid }}"
+              name=""
+              id=""
+              disabled
+            />
+          </div>
+          <div class="col">
+            <label for="">Balance</label>
+            <input
+              type="text"
+              class="form-control"
+              value="{{ project.balance }}"
+              name=""
+              id=""
+              disabled
+            />
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -16,7 +16,7 @@ app.mount("/static", StaticFiles(directory="./static"), name="static")
 
 @app.get("/")
 def render_projects(request: Request):
-    return RedirectResponse(url="/ap/ap-page", status_code=status.HTTP_302_FOUND)
+    return RedirectResponse(url="/ap/projects", status_code=status.HTTP_302_FOUND)
 
 @app.get("/healthy")
 async def health_check():
