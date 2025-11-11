@@ -1,10 +1,11 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from models import AccountsPayable
 from database import SessionLocal
 from typing import Annotated
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from starlette import status
+from fastapi.templating import Jinja2Templates
 
 
 router = APIRouter(
@@ -21,6 +22,8 @@ def get_db():
 
 db_dependency = Annotated[Session, Depends(get_db)]
 
+templates = Jinja2Templates(directory="./templates")
+
 class ProjectRequest(BaseModel):
     project_name: str
     quotation: str
@@ -36,6 +39,14 @@ class ProjectRequest(BaseModel):
     invoice_amount: str
     balance: str
     fully_paid: bool
+
+### Pages ###
+@router.get("/ap-page")
+async def render_ap_page(request: Request, db: db_dependency):
+    projects = db.query(AccountsPayable).all()
+
+    return templates.TemplateResponse("accounts-payable.html", {"request": request, "projects": projects})
+
 
 ### Endpoints ###
 @router.get("/", status_code=status.HTTP_200_OK)

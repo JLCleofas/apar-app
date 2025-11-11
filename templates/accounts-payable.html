@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <div class="card text-center">
+        <div class="card-header">
+            KPH Accounting
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">Accounts Payable</h5>
+            <div class="table-responsive">
+                <div class="table-responsive table-scroll">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Project Name</th>
+                                <th scope="col">Quotation</th>
+                                <th scope="col">Vendor PO</th>
+                                <th scope="col">Supplier</th>
+                                <th scope="col">Balance</th>
+                                <th scope="col">Fully Paid</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for project in projects %}
+                            {% if project.fully_paid %}
+                            <tr style="position: relative" class="table-success">
+                                <td>
+                                    <a class="stretched-link" href="#"></a>
+                                {{project.id}}
+                                </td>
+                                <td>{{ project.project_name }}</td>
+                                <td>{{ project.quotation }}</td>
+                                <td>{{ project.vendor_po }}</td>
+                                <td>{{ project.supplier }}</td>
+                                <td>{{ project.balance }}</td>
+                                <td>{{ project.fully_paid}} </td>
+                            </tr>
+                            {% else %}
+                            <tr style="position: relative">
+                                <td>
+                                    <a class="stretched-link" href="#"></a>
+                                {{project.id}}
+                                </td>
+                                <td>{{ project.project_name }}</td>
+                                <td>{{ project.quotation }}</td>
+                                <td>{{ project.vendor_po }}</td>
+                                <td>{{ project.supplier }}</td>
+                                <td>{{ project.balance }}</td>
+                                <td>{{ project.fully_paid}} </td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </div>
+</div>
+{% endblock %}
