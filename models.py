@@ -1,5 +1,5 @@
 from database import Base
-from sqlalchemy import Column, Integer, String, Boolean, Numeric
+from sqlalchemy import Column, Integer, String, Boolean, Numeric, Date
 
 class AccountsPayable(Base):
     __tablename__  = 'accountspayable'
@@ -12,7 +12,7 @@ class AccountsPayable(Base):
     supplier = Column(String)
     document_type = Column(String)
     invoice_number = Column(String)
-    date_paid = Column(String)
+    date_paid = Column(Date)
     dv_reference = Column(String)
     currency = Column(String)
     po_amount = Column(Numeric(10, 2))
