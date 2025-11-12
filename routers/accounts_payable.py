@@ -1,7 +1,9 @@
+from email.policy import default
+
 from fastapi import APIRouter, Depends, Request, HTTPException, Form, Response
 from models import AccountsPayable
 from database import SessionLocal
-from typing import Annotated
+from typing import Annotated, Optional
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, Field
 from starlette import status
@@ -27,19 +29,19 @@ db_dependency = Annotated[Session, Depends(get_db)]
 templates = Jinja2Templates(directory="./templates")
 
 class ProjectRequest(BaseModel):
-    project_name: str
-    quotation: str
-    acceptance: str
-    vendor_po: str
-    supplier: str
-    document_type: str
-    invoice_number: str
-    date_paid: date
-    dv_reference: str
-    currency: str
-    po_amount: float
-    invoice_amount: float
-    balance: float
+    project_name: str = Field(min_length=1, max_length=100)
+    quotation: str = Field(min_length=14, max_length=20)
+    acceptance: str = Field(min_length=14, max_length=14)
+    vendor_po: str = Field(min_length=14, max_length=14)
+    supplier: str = Field(min_length=1, max_length=50)
+    document_type: Optional[str] = Field(max_length=20, default=None)
+    invoice_number: Optional[str] = Field(max_length=30, default=None)
+    date_paid: Optional[date] = Field(default=None)
+    dv_reference: Optional[str] = Field(max_length=11, default=None)
+    currency: str = Field(min_length=3, max_length=3)
+    po_amount: Optional[float] = Field(default=0.0)
+    invoice_amount: Optional[float] = Field(default=0.0)
+    balance: Optional[float] = Field(default=0.0)
     fully_paid: bool = Field(default=False)
 
 def redirect_to_projects_page():
