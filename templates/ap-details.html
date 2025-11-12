@@ -3,7 +3,11 @@
   <div class="card">
     <div class="card-header">Project Details</div>
     <div class="card-body">
-      <form action="">
+      <form action=""
+            hx-put="/ap/project/{{ project.id }}"
+            hx-swap="none"
+            hx-trigger="submit delay:200ms"
+      >
         <div class="row">
           <div class="col">
             <label for="">Project Name</label>
@@ -11,9 +15,9 @@
               type="text"
               class="form-control"
               value="{{ project.project_name }}"
-              name=""
+              name="project_name"
               id=""
-              disabled
+              readonly
             />
           </div>
           <div class="col">
@@ -22,9 +26,9 @@
               type="text"
               class="form-control"
               value="{{ project.quotation }}"
-              name=""
+              name="quotation"
               id=""
-              disabled
+              readonly
             />
           </div>
           <div class="col">
@@ -33,9 +37,9 @@
               type="text"
               class="form-control"
               value="{{ project.acceptance }}"
-              name=""
+              name="acceptance"
               id=""
-              disabled
+              readonly
             />
           </div>
           <div class="col">
@@ -44,9 +48,9 @@
               type="text"
               class="form-control"
               value="{{ project.vendor_po }}"
-              name=""
+              name="vendor_po"
               id=""
-              disabled
+              readonly
             />
           </div>
         </div>
@@ -57,9 +61,9 @@
               type="text"
               class="form-control"
               value="{{ project.supplier }}"
-              name=""
+              name="supplier"
               id=""
-              disabled
+              readonly
             />
           </div>
           <div class="col">
@@ -68,9 +72,9 @@
               type="text"
               class="form-control"
               value="{{ project.document_type }}"
-              name=""
+              name="document_type"
               id=""
-              disabled
+              readonly
             />
           </div>
           <div class="col">
@@ -79,9 +83,9 @@
               type="text"
               class="form-control"
               value="{{ project.invoice_number }}"
-              name=""
+              name=invoice_number""
               id=""
-              disabled
+              readonly
             />
           </div>
           <div class="col">
@@ -90,9 +94,9 @@
               type="text"
               class="form-control"
               value="{{ project.date_paid }}"
-              name=""
+              name="date_paid"
               id=""
-              disabled
+              readonly
             />
           </div>
         </div>
@@ -103,9 +107,9 @@
               type="text"
               class="form-control"
               value="{{ project.dv_reference }}"
-              name=""
+              name="dv_reference"
               id=""
-              disabled
+              readonly
             />
           </div>
           <div class="col">
@@ -114,58 +118,60 @@
               type="text"
               class="form-control"
               value="{{ project.currency }}"
-              name=""
+              name="currency"
               id=""
-              disabled
+              readonly
             />
           </div>
           <div class="col">
             <label for="">Purchase Order Amount</label>
             <input
-              type="text"
+              type="number"
+              step="0.01"
               class="form-control"
               value="{{ project.po_amount }}"
-              name=""
+              name="po_amount"
               id=""
-              disabled
+
             />
           </div>
           <div class="col">
             <label for="">Invoice Amount</label>
             <input
-              type="text"
+              type="number"
+              step="0.01"
               class="form-control"
               value="{{ project.invoice_amount }}"
-              name=""
+              name="invoice_amount"
               id=""
-              disabled
             />
           </div>
         </div>
         <div class="row">
-          <div class="col">
+          <div class="col-2">
             <label for="">Fully Paid</label>
-            <input
-              type="text"
-              class="form-control"
-              value="{{ project.fully_paid }}"
-              name=""
-              id=""
-              disabled
-            />
+            <select class="form-select" aria-label="Is paid?" name="fully_paid" id="">
+                <option value="true" {% if project.fully_paid %} selected {% endif %}>Yes</option>
+                <option value="false" {% if not project.fully_paid %} selected {% endif %}>No</option>
+            </select>
           </div>
-          <div class="col">
+          <div class="col-7">
             <label for="">Balance</label>
             <input
-              type="text"
+              type="number"
+              step="0.01"
               class="form-control"
               value="{{ project.balance }}"
-              name=""
+              name="balance"
               id=""
-              disabled
+              readonly
             />
           </div>
         </div>
+      <div class="row justify-content-end">
+          <div class="col-1"><button type="submit" class="btn btn-primary">Submit</button></div>
+          <div class="col-1"><button type="reset" class="btn btn-secondary">Cancel</button></div>
+      </div>
       </form>
     </div>
   </div>

@@ -14,11 +14,12 @@
                             <tr>
                                 <th scope="col">#</th>
                                 <th scope="col">Project Name</th>
-                                <th scope="col">Quotation</th>
-                                <th scope="col">Vendor PO</th>
+                                <th scope="col">Quotation Number</th>
+                                <th scope="col">Vendor Purchase Order Number</th>
                                 <th scope="col">Supplier</th>
+                                <th scope="col">PO Amount</th>
                                 <th scope="col">Balance</th>
-                                <th scope="col">Fully Paid</th>
+
                             </tr>
                         </thead>
                         <tbody>
@@ -33,13 +34,13 @@
                                 <td>{{ project.quotation }}</td>
                                 <td>{{ project.vendor_po }}</td>
                                 <td>{{ project.supplier }}</td>
+                                <td>{{ project.po_amount}} </td>
                                 <td>{{ project.balance }}</td>
-                                <td>{{ project.fully_paid}} </td>
                             </tr>
                             {% else %}
                             <tr style="position: relative">
                                 <td>
-                                    <a class="stretched-link" href="#"></a>
+                                    <a class="stretched-link" href="/ap/details/{{ project.id }}"></a>
                                 {{project.id}}
                                 </td>
                                 <td>{{ project.project_name }}</td>
