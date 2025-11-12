@@ -24,8 +24,8 @@
                         </thead>
                         <tbody>
                             {% for project in projects %}
-                            {% if project.fully_paid %}
-                            <tr style="position: relative" class="table-success">
+
+                            <tr style="position: relative" {% if project.fully_paid %} class="table-success" {% endif %}>
                                 <td>
                                     <a class="stretched-link" href="/ap/details/{{ project.id }}"></a>
                                 {{project.id}}
@@ -37,20 +37,6 @@
                                 <td>{{ project.po_amount}} </td>
                                 <td>{{ project.balance }}</td>
                             </tr>
-                            {% else %}
-                            <tr style="position: relative">
-                                <td>
-                                    <a class="stretched-link" href="/ap/details/{{ project.id }}"></a>
-                                {{project.id}}
-                                </td>
-                                <td>{{ project.project_name }}</td>
-                                <td>{{ project.quotation }}</td>
-                                <td>{{ project.vendor_po }}</td>
-                                <td>{{ project.supplier }}</td>
-                                <td>{{ project.balance }}</td>
-                                <td>{{ project.fully_paid}} </td>
-                            </tr>
-                            {% endif %}
                             {% endfor %}
                         </tbody>
                     </table>

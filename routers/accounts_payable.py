@@ -3,10 +3,11 @@ from models import AccountsPayable
 from database import SessionLocal
 from typing import Annotated
 from sqlalchemy.orm import Session
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from starlette import status
 from fastapi.templating import Jinja2Templates
 from starlette.responses import RedirectResponse
+from datetime import date
 
 
 router = APIRouter(
@@ -33,13 +34,13 @@ class ProjectRequest(BaseModel):
     supplier: str
     document_type: str
     invoice_number: str
-    date_paid: str
+    date_paid: date
     dv_reference: str
     currency: str
     po_amount: float
     invoice_amount: float
     balance: float
-    fully_paid: bool
+    fully_paid: bool = Field(default=False)
 
 def redirect_to_projects_page():
     redirect_response = RedirectResponse(url="/ap/projects", status_code=status.HTTP_302_FOUND)
@@ -84,13 +85,15 @@ async def update_project(response: Response,
                          project_id: int,
                          fully_paid: bool = Form(...),
                          po_amount: float = Form(0.0),
-                         invoice_amount: float = Form(0.0)
+                         invoice_amount: float = Form(0.0),
+                         date_paid: date = Form(...),
                          ):
     project_model = db.query(AccountsPayable).filter(AccountsPayable.id == project_id).first()
     if project_model is None:
         raise HTTPException(status_code=404, detail='Project not found')
     project_model.po_amount = po_amount
     project_model.invoice_amount = invoice_amount
+    project_model.date_paid = date_paid
     try:
         balance = po_amount - invoice_amount
         project_model.balance = balance
