@@ -1,3 +1,4 @@
+from decimal import Decimal
 from email.policy import default
 
 from fastapi import APIRouter, Depends, Request, HTTPException, Form, Response
@@ -85,18 +86,16 @@ async def create_project(db: db_dependency, project_request: ProjectRequest):
 async def update_project(response: Response,
                          db: db_dependency,
                          project_id: int,
-                         fully_paid: bool = Form(...),
-                         po_amount: float = Form(0.0),
-                         invoice_amount: float = Form(0.0),
+                         invoice_amount: Decimal = Form(Decimal("0")),
                          date_paid: date = Form(...),
                          ):
     project_model = db.query(AccountsPayable).filter(AccountsPayable.id == project_id).first()
     if project_model is None:
         raise HTTPException(status_code=404, detail='Project not found')
-    project_model.po_amount = po_amount
     project_model.invoice_amount = invoice_amount
     project_model.date_paid = date_paid
     try:
+        po_amount = project_model.po_amount
         balance = po_amount - invoice_amount
         project_model.balance = balance
         if balance == 0:
@@ -104,7 +103,7 @@ async def update_project(response: Response,
         else:
             project_model.fully_paid = False
 
-    except (ValueError, TypeError):
+    except (ValueError, TypeError, ArithmeticError):
         raise HTTPException(status_code=400, detail='Invalid amount')
 
     db.add(project_model)
