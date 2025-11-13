@@ -1,6 +1,4 @@
 from decimal import Decimal
-from email.policy import default
-
 from fastapi import APIRouter, Depends, Request, HTTPException, Form, Response
 from models import AccountsPayable
 from database import SessionLocal
@@ -40,10 +38,18 @@ class ProjectRequest(BaseModel):
     date_paid: Optional[date] = Field(default=None)
     dv_reference: Optional[str] = Field(max_length=11, default=None)
     currency: str = Field(min_length=3, max_length=3)
-    po_amount: Optional[float] = Field(default=0.0)
+    po_amount: float = Field(default=0.0)
     invoice_amount: Optional[float] = Field(default=0.0)
     balance: Optional[float] = Field(default=0.0)
     fully_paid: bool = Field(default=False)
+
+class TransactionRequest(BaseModel):
+    document_type: str = Field(max_length=20, default=None)
+    invoice_amount: float = Field(default=0.0)
+    date_paid: date = Field(default=None)
+    dv_reference: Optional[str] = Field(max_length=11, default=None)
+
+
 
 def redirect_to_projects_page():
     redirect_response = RedirectResponse(url="/ap/projects", status_code=status.HTTP_302_FOUND)
@@ -86,13 +92,17 @@ async def create_project(db: db_dependency, project_request: ProjectRequest):
 async def update_project(response: Response,
                          db: db_dependency,
                          project_id: int,
+                         document_type: Optional[str] = Form(None),
                          invoice_amount: Decimal = Form(Decimal("0")),
+                         dv_reference: Optional[str] = Form(None),
                          date_paid: date = Form(...),
                          ):
     project_model = db.query(AccountsPayable).filter(AccountsPayable.id == project_id).first()
     if project_model is None:
         raise HTTPException(status_code=404, detail='Project not found')
+    project_model.document_type = document_type
     project_model.invoice_amount = invoice_amount
+    project_model.dv_reference = dv_reference
     project_model.date_paid = date_paid
     try:
         po_amount = project_model.po_amount
