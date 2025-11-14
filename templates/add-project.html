@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container">
+        <div class="card mt-3">
+            <div class="card-header text-center">Add New Project</div>
+            <div class="card-body">
+                <h5 class="card-title">Project Details</h5>
+                <form action=""
+                      hx-post="/ap/add-project"
+                      hx-swap="none"
+                      hx-trigger="submit delay:200ms"
+                >
+                    <div class="row">
+                        <div class="col">
+                            <label class="form-label">Project Name</label>
+                            <input
+                                    type="text"
+                                    class="form-control"
+                                    placeholder="Name of Project"
+                                    name="project_name"
+                                    id=""
+                            />
+                        </div>
+                        <div class="col">
+                            <label class="form-label">Quotation Number</label>
+                            <input
+                                    type="text"
+                                    class="form-control"
+                                    placeholder="QKPH-1234-5678"
+                                    name="quotation"
+                                    id=""
+                            />
+                        </div>
+                        <div class="col">
+                            <label class="form-label">Acceptance Number</label>
+                            <input
+                                    type="text"
+                                    class="form-control"
+                                    placeholder="AKPH-1234-5678"
+                                    name="acceptance"
+                                    id=""
+                            />
+                        </div>
+                        <div class="col">
+                            <label class="form-label">Vendor Purchase Order</label>
+                            <input
+                                    type="text"
+                                    class="form-control"
+                                    placeholder="PKPH-1234-5678"
+                                    name="vendor_po"
+                                    id=""
+                            />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <label class="form-label">Supplier</label>
+                            <input
+                                    type="text"
+                                    class="form-control"
+                                    placeholder="Name of Supplier"
+                                    name="supplier"
+                                    id=""
+                            />
+                        </div>
+                        <div class="col">
+                            <label class="form-label">Invoice Number</label>
+                            <input
+                                    type="text"
+                                    class="form-control"
+                                    placeholder="123456789"
+                                    name="invoice_number"
+                                    id=""
+                            />
+                        </div>
+                        <div class="col">
+                            <label class="form-label">Currency</label>
+                            <input
+                                    type="text"
+                                    class="form-control"
+                                    placeholder="PHP"
+                                    name="currency"
+                                    id=""
+                            />
+                        </div>
+                        <div class="col">
+                            <label class="form-label">Purchase Order Amount</label>
+                            <input
+                                    type="number"
+                                    step="0.01"
+                                    class="form-control"
+                                    placeholder="0.00"
+                                    name="po_amount"
+                                    id=""
+                            />
+                        </div>
+                    </div>
+                    <div class="row justify-content-end">
+                        <div class="col-1 ps-4"><button type="submit" class="btn btn-primary mt-3">Add</button></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

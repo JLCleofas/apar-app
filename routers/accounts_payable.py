@@ -68,6 +68,10 @@ async def render_project_details(request: Request, db: db_dependency, project_id
     project_model = db.query(AccountsPayable).filter(AccountsPayable.id == project_id).first()
     return templates.TemplateResponse("ap-details.html", {"request": request, "project": project_model})
 
+@router.get("/add-project-page")
+async def render_add_project_page(request: Request):
+    return templates.TemplateResponse("add-project.html", {"request": request})
+
 ### Endpoints ###
 @router.get("/", status_code=status.HTTP_200_OK)
 async def read_all(db: db_dependency):
@@ -87,6 +91,35 @@ async def create_project(db: db_dependency, project_request: ProjectRequest):
     project_model = AccountsPayable(**project_data)
     db.add(project_model)
     db.commit()
+
+@router.post("/add-project", status_code=status.HTTP_201_CREATED)
+async def add_project(
+        db: db_dependency,
+        project_name: str = Form(...),
+        quotation: str = Form(...),
+        acceptance: str = Form(...),
+        vendor_po: str = Form(...),
+        supplier: str = Form(...),
+        invoice_number: str = Form(...),
+        currency: str = Form(...),
+        po_amount: Decimal = Form(...)
+):
+    project_data = {
+        "project_name": project_name,
+        "quotation": quotation,
+        "acceptance": acceptance,
+        "vendor_po": vendor_po,
+        "supplier": supplier,
+        "invoice_number": invoice_number,
+        "currency": currency,
+        "po_amount": po_amount,
+        "balance": po_amount,
+    }
+
+    project_model = AccountsPayable(**project_data)
+    db.add(project_model)
+    db.commit()
+
 
 @router.put("/project/{project_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def update_project(response: Response,
