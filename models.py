@@ -19,3 +19,9 @@ class AccountsPayable(Base):
     invoice_amount = Column(Numeric(10, 2), nullable=True)
     balance = Column(Numeric(10, 2))
     fully_paid = Column(Boolean, default=False)
+
+    ## TODO: Create a separate column for transaction amounts.
+    ## Make invoice_amount column the sum of ALL transaction amounts.
+
+## TODO: Create a separate table for transaction history for logging purposes.
+## Add a foreign key from the AccountsPayable table ID.
