@@ -1,6 +1,6 @@
 from decimal import Decimal
 from fastapi import APIRouter, Depends, Request, HTTPException, Form, Response
-from models import AccountsPayable
+from models import AccountsPayable, Transaction
 from database import SessionLocal
 from typing import Annotated, Optional
 from sqlalchemy.orm import Session
@@ -130,27 +130,34 @@ async def add_project(
     response.headers["HX-Redirect"] = "/ap/projects"
 
 
-@router.put("/project/{project_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.post("/project/{project_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def add_transaction(response: Response,
                          db: db_dependency,
                          project_id: int,
                          document_type: Optional[str] = Form(None),
-                         invoice_amount: Decimal = Form(Decimal("0")),
+                         transaction_amount: Decimal = Form(Decimal("0")),
                          dv_reference: Optional[str] = Form(None),
                          date_paid: date = Form(...),
                          ):
     project_model = db.query(AccountsPayable).filter(AccountsPayable.id == project_id).first()
     if project_model is None:
         raise HTTPException(status_code=404, detail='Project not found')
-    project_model.document_type = document_type
-    project_model.invoice_amount = invoice_amount
-    project_model.dv_reference = dv_reference
-    project_model.date_paid = date_paid
+
+    transaction_data = {
+        "document_type": document_type,
+        "transaction_amount": transaction_amount,
+        "dv_reference": dv_reference,
+        "date_paid": date_paid,
+        "project_id": project_id,
+    }
     try:
+        invoice_amount = Decimal(str(project_model.invoice_amount or 0))
+        invoice_amount += transaction_amount
+        project_model.invoice_amount = invoice_amount
         po_amount = project_model.po_amount
         balance = po_amount - invoice_amount
         project_model.balance = balance
-        if balance == 0:
+        if project_model.balance == 0:
             project_model.fully_paid = True
         else:
             project_model.fully_paid = False
@@ -158,6 +165,9 @@ async def add_transaction(response: Response,
     except (ValueError, TypeError, ArithmeticError):
         raise HTTPException(status_code=400, detail='Invalid amount')
 
+
+    transaction_model = Transaction(**transaction_data)
+    db.add(transaction_model)
     db.add(project_model)
     db.commit()
 

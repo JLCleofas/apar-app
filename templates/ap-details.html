@@ -1,154 +1,133 @@
 {% extends 'base.html' %} {% block content %}
 <ul class="nav nav-tabs">
-  <li class="nav-item">
-    <a class="nav-link active" aria-current="page" href="/ap/details/{{ project.id }}">Project Details</a>
-  </li>
     <li class="nav-item">
-    <a class="nav-link" aria-current="page" href="/ap/add-transaction/{{ project.id }}">Add Transaction</a>
-  </li>
+        <a class="nav-link active" aria-current="page" href="/ap/details/{{ project.id }}">Project Details</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" aria-current="page" href="/ap/add-transaction/{{ project.id }}">Add Transaction</a>
+    </li>
 
 </ul>
 <div class="container">
-  <div class="card mt-3">
-    <div class="card-header">Project Details</div>
-    <div class="card-body">
-      <form action=""
-            hx-put="/ap/project/{{ project.id }}"
-            hx-swap="none"
-            hx-trigger="submit delay:200ms"
-      >
-        <div class="row">
-          <div class="col">
-            <label class="form-label">Project Name</label>
-            <input
-              type="text"
-              class="form-control"
-              value="{{ project.project_name }}"
-              name="project_name"
-              id=""
-              readonly
-            />
-          </div>
-          <div class="col">
-            <label class="form-label">Quotation Number</label>
-            <input
-              type="text"
-              class="form-control"
-              value="{{ project.quotation }}"
-              name="quotation"
-              id=""
-              readonly
-            />
-          </div>
-          <div class="col">
-            <label class="form-label">Acceptance Number</label>
-            <input
-              type="text"
-              class="form-control"
-              value="{{ project.acceptance }}"
-              name="acceptance"
-              id=""
-              readonly
-            />
-          </div>
-          <div class="col">
-            <label class="form-label">Vendor Purchase Order</label>
-            <input
-              type="text"
-              class="form-control"
-              value="{{ project.vendor_po }}"
-              name="vendor_po"
-              id=""
-              readonly
-            />
-          </div>
+    <div class="card mt-3">
+        <div class="card-header">Project Details</div>
+        <div class="card-body">
+            <form action=""
+                  hx-put="/ap/project/{{ project.id }}"
+                  hx-swap="none"
+                  hx-trigger="submit delay:200ms"
+            >
+                <div class="row">
+                    <div class="col">
+                        <label class="form-label">Project Name</label>
+                        <input
+                                type="text"
+                                class="form-control"
+                                value="{{ project.project_name }}"
+                                name="project_name"
+                                id=""
+                                readonly
+                        />
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Quotation Number</label>
+                        <input
+                                type="text"
+                                class="form-control"
+                                value="{{ project.quotation }}"
+                                name="quotation"
+                                id=""
+                                readonly
+                        />
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Acceptance Number</label>
+                        <input
+                                type="text"
+                                class="form-control"
+                                value="{{ project.acceptance }}"
+                                name="acceptance"
+                                id=""
+                                readonly
+                        />
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Vendor Purchase Order</label>
+                        <input
+                                type="text"
+                                class="form-control"
+                                value="{{ project.vendor_po }}"
+                                name="vendor_po"
+                                id=""
+                                readonly
+                        />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <label class="form-label">Supplier</label>
+                        <input
+                                type="text"
+                                class="form-control"
+                                value="{{ project.supplier }}"
+                                name="supplier"
+                                id=""
+                                readonly
+                        />
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Invoice Amount</label>
+                        <input
+                                type="number"
+                                step="0.01"
+                                class="form-control"
+                                value="{{ project.invoice_amount }}"
+                                name="invoice_amount"
+                                id=""
+                        />
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Currency</label>
+                        <input
+                                type="text"
+                                class="form-control"
+                                value="{{ project.currency }}"
+                                name="currency"
+                                id=""
+                                readonly
+                        />
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Purchase Order Amount</label>
+                        <input
+                                type="number"
+                                step="0.01"
+                                class="form-control"
+                                value="{{ project.po_amount }}"
+                                name="po_amount"
+                                id=""
+                                readonly
+                        />
+                    </div>
+                </div>
+                <div class="row">
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <label class="form-label">Balance</label>
+                        <input
+                                type="number"
+                                step="0.01"
+                                class="form-control"
+                                value="{{ project.balance }}"
+                                name="balance"
+                                id=""
+                                readonly
+                        />
+                    </div>
+                </div>
+            </form>
         </div>
-        <div class="row">
-          <div class="col">
-            <label class="form-label">Supplier</label>
-            <input
-              type="text"
-              class="form-control"
-              value="{{ project.supplier }}"
-              name="supplier"
-              id=""
-              readonly
-            />
-          </div>
-          <div class="col">
-            <label class="form-label">Invoice Number</label>
-            <input
-              type="text"
-              class="form-control"
-              value="{{ project.invoice_number }}"
-              name=invoice_number""
-              id=""
-              readonly
-            />
-          </div>
-            <div class="col">
-            <label class="form-label">Currency</label>
-            <input
-              type="text"
-              class="form-control"
-              value="{{ project.currency }}"
-              name="currency"
-              id=""
-              readonly
-            />
-          </div>
-          <div class="col">
-            <label class="form-label">Purchase Order Amount</label>
-            <input
-              type="number"
-              step="0.01"
-              class="form-control"
-              value="{{ project.po_amount }}"
-              name="po_amount"
-              id=""
-              readonly
-            />
-          </div>
-{#          <div class="col">#}
-{#            <label class="form-label">Date Paid</label>#}
-{#            <input#}
-{#              type="date"#}
-{#              class="form-control"#}
-{#              value="{{ project.date_paid }}"#}
-{#              name="date_paid"#}
-{#              id=""#}
-{#            />#}
-{#          </div>#}
-        </div>
-        <div class="row">
-{#          <div class="col">#}
-{#            <label class="form-label">Invoice Amount</label>#}
-{#            <input#}
-{#              type="number"#}
-{#              step="0.01"#}
-{#              class="form-control"#}
-{#              placeholder="0.00"#}
-{#              name="invoice_amount"#}
-{#              id=""#}
-{#            />#}
-{#          </div>#}
-        </div>
-        <div class="row">
-          <div class="col">
-            <label class="form-label">Balance</label>
-            <input
-              type="number"
-              step="0.01"
-              class="form-control"
-              value="{{ project.balance }}"
-              name="balance"
-              id=""
-              readonly
-            />
-          </div>
-        </div>
-      </form>
     </div>
-  </div>
 </div>
 {% endblock %}

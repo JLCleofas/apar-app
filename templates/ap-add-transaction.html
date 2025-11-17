@@ -14,7 +14,7 @@
     <div class="card mt-3">
         <div class="card-header">Add transaction</div>
         <div class="card-body">
-            <form hx-put="/ap/project/{{ project.id }}"
+            <form hx-post="/ap/project/{{ project.id }}"
                   hx-swap="none"
                   hx-trigger="submit delay:200ms">
                 <div class="row">
@@ -67,8 +67,8 @@
                         </select>
                     </div>
                     <div class="col">
-                        <label class="form-label">Invoice Amount</label>
-                        <input type="number" step="0.01" class="form-control" placeholder="0.00" name="invoice_amount"
+                        <label class="form-label">Payment Amount</label>
+                        <input type="number" step="0.01" class="form-control" placeholder="0.00" name="transaction_amount"
                                id="">
                     </div>
                     <div class="col">
