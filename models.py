@@ -22,8 +22,8 @@ class AccountsPayable(Base):
 
 ## TODO: Create a separate table for transaction history for logging purposes.
 ## Add a foreign key from the AccountsPayable table ID.
-class Transaction(Base):
-    __tablename__ = 'transaction'
+class TransactionLogs(Base):
+    __tablename__ = 'transaction_logs'
 
     transaction_id = Column(Integer, primary_key=True, index=True)
     document_type = Column(String(20), nullable=True)

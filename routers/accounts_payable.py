@@ -1,6 +1,6 @@
 from decimal import Decimal
 from fastapi import APIRouter, Depends, Request, HTTPException, Form, Response
-from models import AccountsPayable, Transaction
+from models import AccountsPayable, TransactionLogs
 from database import SessionLocal
 from typing import Annotated, Optional
 from sqlalchemy.orm import Session
@@ -107,7 +107,7 @@ async def add_project(
         acceptance: str = Form(...),
         vendor_po: str = Form(...),
         supplier: str = Form(...),
-        invoice_number: str = Form(...),
+        invoice_amount: Decimal = Form(Decimal("0")),
         currency: str = Form(...),
         po_amount: Decimal = Form(...)
 ):
@@ -117,7 +117,7 @@ async def add_project(
         "acceptance": acceptance,
         "vendor_po": vendor_po,
         "supplier": supplier,
-        "invoice_number": invoice_number,
+        "invoice_amount": invoice_amount,
         "currency": currency,
         "po_amount": po_amount,
         "balance": po_amount,
@@ -151,12 +151,9 @@ async def add_transaction(response: Response,
         "project_id": project_id,
     }
     try:
-        invoice_amount = Decimal(str(project_model.invoice_amount or 0))
-        invoice_amount += transaction_amount
-        project_model.invoice_amount = invoice_amount
-        po_amount = project_model.po_amount
-        balance = po_amount - invoice_amount
-        project_model.balance = balance
+        project_model.invoice_amount += transaction_amount
+        project_model.balance = project_model.po_amount - project_model.invoice_amount
+
         if project_model.balance == 0:
             project_model.fully_paid = True
         else:
@@ -166,7 +163,7 @@ async def add_transaction(response: Response,
         raise HTTPException(status_code=400, detail='Invalid amount')
 
 
-    transaction_model = Transaction(**transaction_data)
+    transaction_model = TransactionLogs(**transaction_data)
     db.add(transaction_model)
     db.add(project_model)
     db.commit()
