@@ -72,6 +72,11 @@ async def render_project_details(request: Request, db: db_dependency, project_id
 async def render_add_project_page(request: Request):
     return templates.TemplateResponse("add-project.html", {"request": request})
 
+@router.get("/add-transaction/{project_id}")
+async def render_add_transaction_page(request: Request, db: db_dependency, project_id: int):
+    project_model = db.query(AccountsPayable).filter(AccountsPayable.id == project_id).first()
+    return templates.TemplateResponse("ap-add-transaction.html", {"request": request, "project":project_model})
+
 ### Endpoints ###
 @router.get("/", status_code=status.HTTP_200_OK)
 async def read_all(db: db_dependency):
@@ -92,8 +97,10 @@ async def create_project(db: db_dependency, project_request: ProjectRequest):
     db.add(project_model)
     db.commit()
 
+
 @router.post("/add-project", status_code=status.HTTP_201_CREATED)
 async def add_project(
+        response: Response,
         db: db_dependency,
         project_name: str = Form(...),
         quotation: str = Form(...),
@@ -120,9 +127,11 @@ async def add_project(
     db.add(project_model)
     db.commit()
 
+    response.headers["HX-Redirect"] = "/ap/projects"
+
 
 @router.put("/project/{project_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def update_project(response: Response,
+async def add_transaction(response: Response,
                          db: db_dependency,
                          project_id: int,
                          document_type: Optional[str] = Form(None),
@@ -152,4 +161,4 @@ async def update_project(response: Response,
     db.add(project_model)
     db.commit()
 
-    response.headers["HX-Redirect"] = "/ap/projects"
+    response.headers["HX-Redirect"] = f"/ap/details/{project_model.id}"
