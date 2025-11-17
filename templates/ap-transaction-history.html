@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<ul class="nav nav-tabs">
+  <li class="nav-item">
+    <a class="nav-link" aria-current="page" href="/ap/details/{{ project.id }}">Project Details</a>
+  </li>
+    <li class="nav-item">
+    <a class="nav-link" aria-current="page" href="/ap/add-transaction/{{ project.id }}">Add Transaction</a>
+  </li>
+    <li class="nav-item">
+    <a class="nav-link active" aria-current="page" href="/ap/transaction-history/{{ project.id }}">Transaction History</a>
+    </li>
+</ul>
+
+<div class="container">
+    <div class="card mt-3">
+        <div class="card-header">Transaction History</div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">Date</th>
+                        <th scope="col">DV-Reference</th>
+                        <th scope="col">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for transaction in transactions %}
+                <tr style="position: relative;">
+                    <td>{{ transaction.date_paid }}</td>
+                    <td>{{ transaction.dv_reference }}</td>
+                    <td>{{ transaction.transaction_amount }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -77,6 +77,12 @@ async def render_add_transaction_page(request: Request, db: db_dependency, proje
     project_model = db.query(AccountsPayable).filter(AccountsPayable.id == project_id).first()
     return templates.TemplateResponse("ap-add-transaction.html", {"request": request, "project":project_model})
 
+@router.get("/transaction-history/{project_id}")
+async def render_transaction_history_page(request: Request, db: db_dependency, project_id: int):
+    project_model = db.query(AccountsPayable).filter(AccountsPayable.id == project_id).first()
+    transaction_logs = db.query(TransactionLogs).filter(TransactionLogs.project_id == project_id).all()
+    return templates.TemplateResponse("ap-transaction-history.html", {"request": request, "project":project_model, "transactions":transaction_logs})
+
 ### Endpoints ###
 @router.get("/", status_code=status.HTTP_200_OK)
 async def read_all(db: db_dependency):
