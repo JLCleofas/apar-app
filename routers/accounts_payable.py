@@ -83,7 +83,15 @@ async def render_transaction_history_page(request: Request, db: db_dependency, p
     transaction_logs = db.query(TransactionLogs).filter(TransactionLogs.project_id == project_id).all()
     return templates.TemplateResponse("ap-transaction-history.html", {"request": request, "project":project_model, "transactions":transaction_logs})
 
+@router.get("/record-invoice/{project_id}")
+async def render_record_invoice_page(request: Request, db: db_dependency, project_id: int):
+    project_model = db.query(AccountsPayable).filter(AccountsPayable.id == project_id).first()
+    return templates.TemplateResponse("ap-record-invoice.html", {"request": request, "project":project_model})
 ### Endpoints ###
+
+## TODO: Add delete project endpoint
+## TODO: Add search functionality
+## TODO: Add report generation
 @router.get("/", status_code=status.HTTP_200_OK)
 async def read_all(db: db_dependency):
     return db.query(AccountsPayable).all()
@@ -136,7 +144,7 @@ async def add_project(
     response.headers["HX-Redirect"] = "/ap/projects"
 
 
-@router.post("/project/{project_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.post("/project/{project_id}", status_code=status.HTTP_201_CREATED)
 async def add_transaction(response: Response,
                          db: db_dependency,
                          project_id: int,
@@ -158,6 +166,9 @@ async def add_transaction(response: Response,
     }
     try:
         project_model.invoice_amount += transaction_amount
+        ## TODO: Add condition to subtract only if DV-Reference is not None.
+        ## TODO: Add error handling when balance is lower than invoice amount.
+        ## TODO: Add error handling to prevent negative balance.
         project_model.balance = project_model.po_amount - project_model.invoice_amount
 
         if project_model.balance == 0:

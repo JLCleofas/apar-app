@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}{% set active_tab = 'record-invoice' %}{% include 'ap-tabs.html' %}
+{#	TODO: Add Record invoice page#}
+{#  This will be placed before the add transaction page#}
+    <div class="container">
+        <div class="card mt-3">
+            <div class="card-header">Record Invoice</div>
+            <div class="card-body">
+                <form action=""
+                      hx-post="/ap/record-invoice/{{ project.id }}"
+                      hx-swap="none"
+                      hx-trigger="submit delay:200ms">
+                    <div class="row">
+                        <div class="col">
+                            <label class="form-label" for="document_type">Document Type</label>
+                            <input type="text" class="form-control" name="document_type">
+                        </div>
+                        <div class="col">
+                            <label class="form-label" for="document_type">Invoice Type</label>
+                            <select class="form-select" name="document_type" id="">
+                            <option value="Sales Invoice">Sales Invoice</option>
+                            <option value="Service Invoice">Service Invoice</option>
+                            <option value="B Invoice">B Invoice</option>
+                            <option value="INV">INV</option>
+                            <option value="BS">BS</option>
+                            </select>
+                        </div>
+                        <div class="col">
+                            <label class="form-label" for="invoice_number">Invoice Number</label>
+                            <input type="text" class="form-control" name="invoice_number">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+

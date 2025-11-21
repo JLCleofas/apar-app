@@ -4,6 +4,7 @@ from sqlalchemy import Column, Integer, String, Boolean, Numeric, Date, ForeignK
 class AccountsPayable(Base):
     __tablename__  = 'accountspayable'
 
+    ## TODO: Add soft delete column.
     id = Column(Integer, primary_key=True, index=True)
     project_name = Column(String(100), nullable=False)
     quotation = Column(String(20), index=True)
@@ -22,9 +23,11 @@ class AccountsPayable(Base):
 
 ## TODO: Create a separate table for transaction history for logging purposes.
 ## Add a foreign key from the AccountsPayable table ID.
+# TODO: Change name of the table to invoices. Then add an is_paid column.
 class TransactionLogs(Base):
     __tablename__ = 'transaction_logs'
 
+    # TODO: Add soft delete column.
     transaction_id = Column(Integer, primary_key=True, index=True)
     document_type = Column(String(20), nullable=True)
     transaction_amount = Column(Numeric(10, 2), nullable=False)

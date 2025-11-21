@@ -1,22 +1,14 @@
 {% extends "base.html" %}
 
 {% block content %}
-<ul class="nav nav-tabs">
-  <li class="nav-item">
-    <a class="nav-link" aria-current="page" href="/ap/details/{{ project.id }}">Project Details</a>
-  </li>
-    <li class="nav-item">
-    <a class="nav-link" aria-current="page" href="/ap/add-transaction/{{ project.id }}">Add Transaction</a>
-  </li>
-    <li class="nav-item">
-    <a class="nav-link active" aria-current="page" href="/ap/transaction-history/{{ project.id }}">Transaction History</a>
-    </li>
-</ul>
+{% set active_tab = 'transaction-history' %}
+{% include 'ap-tabs.html' %}
 
 <div class="container">
     <div class="card mt-3">
         <div class="card-header">Transaction History</div>
         <div class="card-body">
+{#        TODO: Add function to edit transactions but the DV-Reference only#}
             <table class="table table-striped">
                 <thead>
                     <tr>

@@ -1,21 +1,13 @@
 {% extends "base.html" %}
-{% block content %}
-<ul class="nav nav-tabs">
-  <li class="nav-item">
-    <a class="nav-link" aria-current="page" href="/ap/details/{{ project.id }}">Project Details</a>
-  </li>
-    <li class="nav-item">
-    <a class="nav-link active" aria-current="page" href="/ap/add-transaction/{{ project.id }}">Add Transaction</a>
-  </li>
-    <li class="nav-item">
-    <a class="nav-link" aria-current="page" href="/ap/transaction-history/{{ project.id }}">Transaction History</a>
-    </li>
-</ul>
+{% block content %}{% set active_tab = 'add-transaction' %}
+{% include 'ap-tabs.html' %}
 {#    Add Transaction#}
 <div class="container">
     <div class="card mt-3">
         <div class="card-header">Add transaction</div>
         <div class="card-body">
+{#            TODO: Add a dropdown to select from the issued invoice table#}
+{#            This will be the invoice number#}
             <form hx-post="/ap/project/{{ project.id }}"
                   hx-swap="none"
                   hx-trigger="submit delay:200ms">
