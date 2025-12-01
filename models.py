@@ -16,7 +16,7 @@ class BaseModel(Base):
 class APProject(BaseModel):
     __tablename__  = 'ap_projects'
 
-    project_name = Column(String(100), nullable=False)
+    client = Column(String(100), nullable=False)
     quotation = Column(String(20), index=True)
     acceptance = Column(String(14), index=True)
     currency = Column(String(3))
