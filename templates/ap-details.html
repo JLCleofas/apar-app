@@ -12,11 +12,11 @@
             >
                 <div class="row">
                     <div class="col">
-                        <label class="form-label">Project Name</label>
+                        <label class="form-label">Client</label>
                         <input
                                 type="text"
                                 class="form-control"
-                                value="{{ project.project_name }}"
+                                value="{{ project.client }}"
                                 name="project_name"
                                 id=""
                                 readonly
@@ -44,82 +44,57 @@
                                 readonly
                         />
                     </div>
-                    <div class="col">
-                        <label class="form-label">Vendor Purchase Order</label>
-                        <input
-                                type="text"
-                                class="form-control"
-                                value="{{ project.vendor_po }}"
-                                name="vendor_po"
-                                id=""
-                                readonly
-                        />
-                    </div>
                 </div>
                 <div class="row">
-                    <div class="col">
-                        <label class="form-label">Supplier</label>
-                        <input
-                                type="text"
-                                class="form-control"
-                                value="{{ project.supplier }}"
-                                name="supplier"
-                                id=""
-                                readonly
-                        />
-                    </div>
 {#                    TODO: Add another field for invoice number for the issued amount#}
 {#                    This existing field is for the paid amount#}
                     <div class="col">
-                        <label class="form-label">Invoice Amount</label>
-                        <input
-                                type="number"
-                                step="0.01"
-                                class="form-control"
-                                value="{{ project.invoice_amount }}"
-                                name="invoice_amount"
-                                id=""
-                                readonly
-                        />
+                        <label class="form-label" for="total_po_amount">Total Purchase Order Amount</label>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="basic-addon1">{{ project.currency }}</span>
+                            <input
+                                    type="number"
+                                    step="0.01"
+                                    class="form-control"
+                                    value="{{  project.total_po_amount }}"
+                                    name="total_po_amount"
+                                    id=""
+                                    aria-describedby="basic-addon1"
+                                    readonly
+                            />
+
+                        </div>
                     </div>
                     <div class="col">
-                        <label class="form-label">Currency</label>
-                        <input
-                                type="text"
-                                class="form-control"
-                                value="{{ project.currency }}"
-                                name="currency"
-                                id=""
-                                readonly
-                        />
+                        <label class="form-label">Total Paid Amount</label>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="basic-addon1">{{ project.currency }}</span>
+                            <input
+                                    type="number"
+                                    step="0.01"
+                                    class="form-control"
+                                    value="{{ project.total_paid }}"
+                                    name="total_paid"
+                                    id=""
+                                    readonly
+                            />
+                        </div>
                     </div>
-                    <div class="col">
-                        <label class="form-label">Purchase Order Amount</label>
-                        <input
-                                type="number"
-                                step="0.01"
-                                class="form-control"
-                                value="{{ project.po_amount }}"
-                                name="po_amount"
-                                id=""
-                                readonly
-                        />
-                    </div>
-                </div>
-                <div class="row">
-                </div>
-                <div class="row">
                     <div class="col">
                         <label class="form-label">Balance</label>
-                        <input
-                                type="number"
-                                step="0.01"
-                                class="form-control"
-                                value="{{ project.balance }}"
-                                name="balance"
-                                id=""
-                                readonly
-                        />
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="basic-addon1">{{ project.currency }}</span>
+                            <input
+
+                                    type="number"
+                                    step="0.01"
+                                    class="form-control"
+                                    value="{{ project.balance }}"
+                                    name="balance"
+                                    id=""
+                                    readonly
+                            />
+                        </div>
                     </div>
                 </div>
             </form>
