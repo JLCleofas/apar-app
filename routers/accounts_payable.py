@@ -1,6 +1,6 @@
 from decimal import Decimal
 from fastapi import APIRouter, Depends, Request, HTTPException, Form, Response
-from models import AccountsPayable, TransactionLogs
+from models import APProject, Invoice, TransactionLog
 from database import SessionLocal
 from typing import Annotated, Optional
 from sqlalchemy.orm import Session
@@ -31,17 +31,17 @@ class ProjectRequest(BaseModel):
     project_name: str = Field(min_length=1, max_length=100)
     quotation: str = Field(min_length=14, max_length=20)
     acceptance: str = Field(min_length=14, max_length=14)
-    vendor_po: str = Field(min_length=14, max_length=14)
-    supplier: str = Field(min_length=1, max_length=50)
-    document_type: Optional[str] = Field(max_length=20, default=None)
-    invoice_number: Optional[str] = Field(max_length=30, default=None)
-    date_paid: Optional[date] = Field(default=None)
-    dv_reference: Optional[str] = Field(max_length=11, default=None)
     currency: str = Field(min_length=3, max_length=3)
-    po_amount: float = Field(default=0.0)
-    invoice_amount: Optional[float] = Field(default=0.0)
+    total_po_amount: float = Field(default=0.0)
+    total_paid: Optional[float] = Field(default=0.0)
     balance: Optional[float] = Field(default=0.0)
     fully_paid: bool = Field(default=False)
+
+class InvoiceRequest(BaseModel):
+    vendor: str = Field(min_length=1, max_length=50)
+    vendor_po: str = Field(min_length=14, max_length=14)
+    invoice_type: Optional[str] = Field(max_length=20, default=None)
+    invoice_number: Optional[str] = Field(max_length=30, default=None)
 
 class TransactionRequest(BaseModel):
     document_type: str = Field(max_length=20, default=None)
@@ -59,13 +59,13 @@ def redirect_to_projects_page():
 ### Pages ###
 @router.get("/projects")
 async def render_ap_page(request: Request, db: db_dependency):
-    projects = db.query(AccountsPayable).all()
+    projects = db.query(APProject).all()
 
     return templates.TemplateResponse("accounts-payable.html", {"request": request, "projects": projects})
 
 @router.get("/details/{project_id}")
 async def render_project_details(request: Request, db: db_dependency, project_id: int):
-    project_model = db.query(AccountsPayable).filter(AccountsPayable.id == project_id).first()
+    project_model = db.query(APProject).filter(APProject.id == project_id).first()
     return templates.TemplateResponse("ap-details.html", {"request": request, "project": project_model})
 
 @router.get("/add-project-page")
@@ -74,18 +74,18 @@ async def render_add_project_page(request: Request):
 
 @router.get("/add-transaction/{project_id}")
 async def render_add_transaction_page(request: Request, db: db_dependency, project_id: int):
-    project_model = db.query(AccountsPayable).filter(AccountsPayable.id == project_id).first()
+    project_model = db.query(APProject).filter(APProject.id == project_id).first()
     return templates.TemplateResponse("ap-add-transaction.html", {"request": request, "project":project_model})
 
 @router.get("/transaction-history/{project_id}")
 async def render_transaction_history_page(request: Request, db: db_dependency, project_id: int):
-    project_model = db.query(AccountsPayable).filter(AccountsPayable.id == project_id).first()
-    transaction_logs = db.query(TransactionLogs).filter(TransactionLogs.project_id == project_id).all()
+    project_model = db.query(APProject).filter(APProject.id == project_id).first()
+    transaction_logs = db.query(TransactionLog).filter(TransactionLog.project_id == project_id).all()
     return templates.TemplateResponse("ap-transaction-history.html", {"request": request, "project":project_model, "transactions":transaction_logs})
 
 @router.get("/record-invoice/{project_id}")
 async def render_record_invoice_page(request: Request, db: db_dependency, project_id: int):
-    project_model = db.query(AccountsPayable).filter(AccountsPayable.id == project_id).first()
+    project_model = db.query(APProject).filter(APProject.id == project_id).first()
     return templates.TemplateResponse("ap-record-invoice.html", {"request": request, "project":project_model})
 ### Endpoints ###
 
@@ -94,7 +94,7 @@ async def render_record_invoice_page(request: Request, db: db_dependency, projec
 ## TODO: Add report generation
 @router.get("/", status_code=status.HTTP_200_OK)
 async def read_all(db: db_dependency):
-    return db.query(AccountsPayable).all()
+    return db.query(APProject).all()
 
 @router.post("/project", status_code=status.HTTP_201_CREATED)
 async def create_project(db: db_dependency, project_request: ProjectRequest):
@@ -107,7 +107,7 @@ async def create_project(db: db_dependency, project_request: ProjectRequest):
     except (ValueError, TypeError):
         project_data['balance'] = 0
 
-    project_model = AccountsPayable(**project_data)
+    project_model = APProject(**project_data)
     db.add(project_model)
     db.commit()
 
@@ -116,28 +116,23 @@ async def create_project(db: db_dependency, project_request: ProjectRequest):
 async def add_project(
         response: Response,
         db: db_dependency,
-        project_name: str = Form(...),
+        client: str = Form(...),
         quotation: str = Form(...),
         acceptance: str = Form(...),
-        vendor_po: str = Form(...),
-        supplier: str = Form(...),
-        invoice_amount: Decimal = Form(Decimal("0")),
         currency: str = Form(...),
-        po_amount: Decimal = Form(...)
+        total_po_amount: Decimal = Form(...)
 ):
     project_data = {
-        "project_name": project_name,
+        "client": client,
         "quotation": quotation,
         "acceptance": acceptance,
-        "vendor_po": vendor_po,
-        "supplier": supplier,
-        "invoice_amount": invoice_amount,
         "currency": currency,
-        "po_amount": po_amount,
-        "balance": po_amount,
+        "total_po_amount": total_po_amount,
+        "total_paid": 0,
+        "balance": total_po_amount,
     }
 
-    project_model = AccountsPayable(**project_data)
+    project_model = APProject(**project_data)
     db.add(project_model)
     db.commit()
 
@@ -153,7 +148,7 @@ async def add_transaction(response: Response,
                          dv_reference: Optional[str] = Form(None),
                          date_paid: date = Form(...),
                          ):
-    project_model = db.query(AccountsPayable).filter(AccountsPayable.id == project_id).first()
+    project_model = db.query(APProject).filter(APProject.id == project_id).first()
     if project_model is None:
         raise HTTPException(status_code=404, detail='Project not found')
 
@@ -180,7 +175,7 @@ async def add_transaction(response: Response,
         raise HTTPException(status_code=400, detail='Invalid amount')
 
 
-    transaction_model = TransactionLogs(**transaction_data)
+    transaction_model = TransactionLog(**transaction_data)
     db.add(transaction_model)
     db.add(project_model)
     db.commit()
