@@ -1,36 +1,54 @@
 from database import Base
 from sqlalchemy import Column, Integer, String, Boolean, Numeric, Date, ForeignKey
+from sqlalchemy.orm import relationship, Mapped, mapped_column
 
-class AccountsPayable(Base):
-    __tablename__  = 'accountspayable'
 
-    ## TODO: Add soft delete column.
+class BaseModel(Base):
+    __abstract__ = True
+    __allow_unmapped__ = True
+
     id = Column(Integer, primary_key=True, index=True)
+    is_deleted = Column(Boolean, default=False)
+    is_paid = Column(Boolean, default=False)
+    # created_at = Column(Date, default=None)
+    # updated_at = Column(Date, default=None)
+
+class APProject(BaseModel):
+    __tablename__  = 'ap_projects'
+
     project_name = Column(String(100), nullable=False)
     quotation = Column(String(20), index=True)
     acceptance = Column(String(14), index=True)
-    vendor_po = Column(String(14), index=True)
-    supplier = Column(String(50))
-    invoice_number = Column(String(30), nullable=True)
     currency = Column(String(3))
-    po_amount = Column(Numeric(10, 2))
-    invoice_amount = Column(Numeric(10, 2), nullable=True)
+    total_po_amount = Column(Numeric(10, 2))
+    total_paid = Column(Numeric(10, 2), nullable=True)
     balance = Column(Numeric(10, 2))
-    fully_paid = Column(Boolean, default=False)
 
-    ## TODO: Create a separate column for transaction amounts.
-    ## Make invoice_amount column the sum of ALL transaction amounts.
+    invoices: Mapped[list['Invoice']] = relationship(back_populates="project")
+    transactions: Mapped[list['TransactionLog']] = relationship(back_populates="project", order_by=lambda: TransactionLog.date_paid)
 
-## TODO: Create a separate table for transaction history for logging purposes.
-## Add a foreign key from the AccountsPayable table ID.
-# TODO: Change name of the table to invoices. Then add an is_paid column.
-class TransactionLogs(Base):
+class Invoice(BaseModel):
+    __tablename__ = 'invoices'
+    project_id: Mapped[int] = mapped_column(ForeignKey('ap_projects.id'), nullable=False)
+    vendor = Column(String(50))
+    vendor_po = Column(String(14), index=True)
+    invoice_type = Column(String(20), nullable=True)
+    invoice_number = Column(String(30), nullable=True)
+    invoice_amount = Column(Numeric(10, 2), nullable=False)
+
+    project: Mapped['APProject'] = relationship(back_populates="invoices")
+    transactions: Mapped[list['TransactionLog']] = relationship(back_populates="invoice")
+
+class TransactionLog(BaseModel):
     __tablename__ = 'transaction_logs'
 
-    # TODO: Add soft delete column.
-    transaction_id = Column(Integer, primary_key=True, index=True)
+    project_id: Mapped[int] = mapped_column(ForeignKey('ap_projects.id'), nullable=False)
+    invoice_id: Mapped[int] = mapped_column(ForeignKey('invoices.id'), nullable=False)
+
     document_type = Column(String(20), nullable=True)
     transaction_amount = Column(Numeric(10, 2), nullable=False)
     date_paid = Column(Date, nullable=False)
     dv_reference = Column(String(11), nullable=True)
-    project_id = Column(Integer, ForeignKey('accountspayable.id'), nullable=False)
+
+    invoice: Mapped['Invoice'] = relationship(back_populates="transactions")
+    project: Mapped['APProject'] = relationship(back_populates="transactions")
