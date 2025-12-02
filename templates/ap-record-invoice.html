@@ -1,41 +1,92 @@
 {% extends "base.html" %}
 
 {% block content %}{% set active_tab = 'record-invoice' %}{% include 'ap-tabs.html' %}
-{#	TODO: Add Record invoice page#}
-{#  This will be placed before the add transaction page#}
+    {#	TODO: Add Record invoice page#}
+    {#  This will be placed before the add transaction page#}
+    <div id="liveAlertPlaceholder"></div>
     <div class="container">
         <div class="card mt-3">
             <div class="card-header">Record Invoice</div>
             <div class="card-body">
+                {# TODO: Disable submit action when Enter key is pressed. #}
                 <form action=""
                       hx-post="/ap/record-invoice/{{ project.id }}"
                       hx-swap="none"
                       hx-trigger="submit delay:200ms">
                     <div class="row">
                         <div class="col">
-                            <label class="form-label" for="document_type">Document Type</label>
-                            <input type="text" class="form-control" name="document_type">
+                            <label class="form-label" for="vendor_po">Vendor Purchase Order Number</label>
+                            <input type="text" class="form-control" name="vendor_po">
                         </div>
                         <div class="col">
-                            <label class="form-label" for="document_type">Invoice Type</label>
-                            <select class="form-select" name="document_type" id="">
-                            <option value="Sales Invoice">Sales Invoice</option>
-                            <option value="Service Invoice">Service Invoice</option>
-                            <option value="B Invoice">B Invoice</option>
-                            <option value="INV">INV</option>
-                            <option value="BS">BS</option>
+                            <label class="form-label" for="vendor">Vendor</label>
+                            <input type="text" class="form-control" name="vendor">
+                        </div>
+                        {#                        <div class="col">#}
+                        {#                            <label class="form-label" for="currency">Currency</label>#}
+                        {#                            <select class="form-select" name="currency" id="currency">#}
+                        {#                                <option value="PHP">PHP</option>#}
+                        {#                                <option value="USD">USD</option>#}
+                        {#                            </select>#}
+                        {#                        </div>#}
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <label class="form-label" for="invoice_type">Invoice Type</label>
+                            <select class="form-select" name="invoice_type" id="invoice_type">
+                                <option value="Sales Invoice">Sales Invoice</option>
+                                <option value="Service Invoice">Service Invoice</option>
+                                <option value="B Invoice">B Invoice</option>
+                                <option value="INV">INV</option>
+                                <option value="BS">BS</option>
                             </select>
                         </div>
                         <div class="col">
                             <label class="form-label" for="invoice_number">Invoice Number</label>
                             <input type="text" class="form-control" name="invoice_number">
                         </div>
+                        <div class="col">
+                            <label class="form-label" for="invoice_amount">Invoice Amount</label>
+                            <input type="number" step="0.01" class="form-control" name="invoice_amount">
+                        </div>
                     </div>
+                    <div class="row justify-content-end">
+                        <div class="col-1">
+                            <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal"
+                                    data-bs-target="#staticBackdrop">Submit
+                            </button>
+                        </div>
+                        <div class="col-1">
+                            <button type="reset" class="btn btn-secondary mt-3">Reset</button>
+                        </div>
+                    </div>
+                    {% include 'modals.html' %}
                 </form>
             </div>
         </div>
     </div>
 
+    <script>
+        const alertPlaceholder = document.getElementById('liveAlertPlaceholder')
+        const appendAlert = (message, type) => {
+            const wrapper = document.createElement('div')
+            wrapper.innerHTML = [
+                `<div class="alert alert-${type} alert-dismissible" role="alert">`,
+                `   <div>${message}</div>`,
+                '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
+                '</div>'
+            ].join('')
+
+            alertPlaceholder.append(wrapper)
+        }
+
+        const alertTrigger = document.getElementById('liveAlertBtn')
+        if (alertTrigger) {
+            alertTrigger.addEventListener('click', () => {
+                appendAlert('Success!', 'success')
+            })
+        }
+    </script>
 {% endblock %}
 
 

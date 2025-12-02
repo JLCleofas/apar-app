@@ -38,10 +38,11 @@ class ProjectRequest(BaseModel):
     fully_paid: bool = Field(default=False)
 
 class InvoiceRequest(BaseModel):
-    vendor: str = Field(min_length=1, max_length=50)
-    vendor_po: str = Field(min_length=14, max_length=14)
-    invoice_type: Optional[str] = Field(max_length=20, default=None)
-    invoice_number: Optional[str] = Field(max_length=30, default=None)
+    vendor: str = Form(min_length=1, max_length=50)
+    vendor_po: str = Form(min_length=14, max_length=14)
+    invoice_type: str = Form(max_length=20, default=None)
+    invoice_number: str = Form(max_length=30, default=None)
+    invoice_amount: Decimal = Form(Decimal("0"))
 
 class TransactionRequest(BaseModel):
     document_type: str = Field(max_length=20, default=None)
@@ -72,18 +73,18 @@ async def render_project_details(request: Request, db: db_dependency, project_id
 async def render_add_project_page(request: Request):
     return templates.TemplateResponse("add-project.html", {"request": request})
 
-@router.get("/add-transaction/{project_id}")
+@router.get("/add-transaction-page/{project_id}")
 async def render_add_transaction_page(request: Request, db: db_dependency, project_id: int):
     project_model = db.query(APProject).filter(APProject.id == project_id).first()
     return templates.TemplateResponse("ap-add-transaction.html", {"request": request, "project":project_model})
 
-@router.get("/transaction-history/{project_id}")
+@router.get("/transaction-history-page/{project_id}")
 async def render_transaction_history_page(request: Request, db: db_dependency, project_id: int):
     project_model = db.query(APProject).filter(APProject.id == project_id).first()
     transaction_logs = db.query(TransactionLog).filter(TransactionLog.project_id == project_id).all()
     return templates.TemplateResponse("ap-transaction-history.html", {"request": request, "project":project_model, "transactions":transaction_logs})
 
-@router.get("/record-invoice/{project_id}")
+@router.get("/record-invoice-page/{project_id}")
 async def render_record_invoice_page(request: Request, db: db_dependency, project_id: int):
     project_model = db.query(APProject).filter(APProject.id == project_id).first()
     return templates.TemplateResponse("ap-record-invoice.html", {"request": request, "project":project_model})
@@ -138,7 +139,26 @@ async def add_project(
 
     response.headers["HX-Redirect"] = "/ap/projects"
 
-
+@router.post("/record-invoice/{project_id}", status_code=status.HTTP_201_CREATED)
+async def add_invoice(db: db_dependency,
+                    project_id: int,
+                    vendor: str = Form(min_length=1, max_length=50),
+                    vendor_po: str = Form(min_length=14, max_length=14),
+                    invoice_type: str = Form(max_length=20, default=None),
+                    invoice_number: str = Form(max_length=30, default=None),
+                    invoice_amount: Decimal = Form(Decimal("0"))
+                    ):
+    invoice_data = {
+        "project_id": project_id,
+        "vendor": vendor,
+        "vendor_po": vendor_po,
+        "invoice_type": invoice_type,
+        "invoice_number": invoice_number,
+        "invoice_amount": invoice_amount
+    }
+    invoice_model = Invoice(**invoice_data)
+    db.add(invoice_model)
+    db.commit()
 @router.post("/project/{project_id}", status_code=status.HTTP_201_CREATED)
 async def add_transaction(response: Response,
                          db: db_dependency,
