@@ -37,21 +37,6 @@ class ProjectRequest(BaseModel):
     balance: Optional[float] = Field(default=0.0)
     fully_paid: bool = Field(default=False)
 
-class InvoiceRequest(BaseModel):
-    vendor: str = Form(min_length=1, max_length=50)
-    vendor_po: str = Form(min_length=14, max_length=14)
-    invoice_type: str = Form(max_length=20, default=None)
-    invoice_number: str = Form(max_length=30, default=None)
-    invoice_amount: Decimal = Form(Decimal("0"))
-
-class TransactionRequest(BaseModel):
-    document_type: str = Field(max_length=20, default=None)
-    invoice_amount: float = Field(default=0.0)
-    date_paid: date = Field(default=None)
-    dv_reference: Optional[str] = Field(max_length=11, default=None)
-
-
-
 def redirect_to_projects_page():
     redirect_response = RedirectResponse(url="/ap/projects", status_code=status.HTTP_302_FOUND)
 
@@ -139,6 +124,7 @@ async def add_project(
 
     response.headers["HX-Redirect"] = "/ap/projects"
 
+# TODO: Add error handling for duplicate invoice
 @router.post("/record-invoice/{project_id}", status_code=status.HTTP_201_CREATED)
 async def add_invoice(db: db_dependency,
                     project_id: int,
