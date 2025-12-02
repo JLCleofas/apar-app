@@ -1,8 +1,6 @@
 {% extends "base.html" %}
 
 {% block content %}{% set active_tab = 'record-invoice' %}{% include 'ap-tabs.html' %}
-    {#	TODO: Add Record invoice page#}
-    {#  This will be placed before the add transaction page#}
     <div id="liveAlertPlaceholder"></div>
     <div class="container">
         <div class="card mt-3">
@@ -14,6 +12,10 @@
                       hx-swap="none"
                       hx-trigger="submit delay:200ms">
                     <div class="row">
+                        {# TODO: Remove Vendor PO Number and Vendor column #}
+                        {#  Add to separate 'Add Purchase Order Page' #}
+                        {# Vendor PO Number, vendor column, currency, and po amount #}
+                        {# TODO: Add a dropdown for the lists of PO to vendor #}
                         <div class="col">
                             <label class="form-label" for="vendor_po">Vendor Purchase Order Number</label>
                             <input type="text" class="form-control" name="vendor_po">
