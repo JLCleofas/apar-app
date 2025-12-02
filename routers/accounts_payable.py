@@ -73,6 +73,8 @@ async def render_transaction_history_page(request: Request, db: db_dependency, p
 async def render_record_invoice_page(request: Request, db: db_dependency, project_id: int):
     project_model = db.query(APProject).filter(APProject.id == project_id).first()
     return templates.TemplateResponse("ap-record-invoice.html", {"request": request, "project":project_model})
+
+# TODO: Add page endpoint for Add PO page
 ### Endpoints ###
 
 ## TODO: Add delete project endpoint
@@ -125,6 +127,11 @@ async def add_project(
     response.headers["HX-Redirect"] = "/ap/projects"
 
 # TODO: Add error handling for duplicate invoice
+# TODO: Add error handling for invoices that exceed PO amount
+# TODO: Add error handling for negative invoice amounts
+# TODO: Add error handling for zero invoice amounts
+# TODO: Add error handling for Vendor POs that exceeds Total PO amount
+# TODO: Add error handling for isDeleted column
 @router.post("/record-invoice/{project_id}", status_code=status.HTTP_201_CREATED)
 async def add_invoice(db: db_dependency,
                     project_id: int,
