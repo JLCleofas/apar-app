@@ -26,7 +26,8 @@ class APProject(BaseModel):
 
     invoices: Mapped[list['Invoice']] = relationship(back_populates="project")
     transactions: Mapped[list['TransactionLog']] = relationship(back_populates="project", order_by=lambda: TransactionLog.date_paid)
-
+# TODO: Add table for PO to vendor
+# TODO: Remove vendor, vendor_po from Invoice
 class Invoice(BaseModel):
     __tablename__ = 'invoices'
     project_id: Mapped[int] = mapped_column(ForeignKey('ap_projects.id'), nullable=False)
