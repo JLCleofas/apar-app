@@ -26,19 +26,29 @@ class APProject(BaseModel):
 
     invoices: Mapped[list['Invoice']] = relationship(back_populates="project")
     transactions: Mapped[list['TransactionLog']] = relationship(back_populates="project", order_by=lambda: TransactionLog.date_paid)
+    po_to_vendor: Mapped[list['POToVendor']] = relationship(back_populates="project")
 # TODO: Add table for PO to vendor
 # TODO: Remove vendor, vendor_po from Invoice
+class POToVendor(BaseModel):
+    __tablename__ = 'po_to_vendor'
+    project_id: Mapped[int] = mapped_column(ForeignKey('ap_projects.id'), nullable=False)
+    vendor = Column(String(50), nullable=False)
+    po_amount = Column(Numeric(10, 2), nullable=False)
+    currency = Column(String(3), nullable=False)
+
+    project: Mapped['APProject'] = relationship(back_populates="po_to_vendor")
 class Invoice(BaseModel):
     __tablename__ = 'invoices'
     project_id: Mapped[int] = mapped_column(ForeignKey('ap_projects.id'), nullable=False)
-    vendor = Column(String(50))
-    vendor_po = Column(String(14), index=True)
+    vendor_po_id = Mapped[int] = mapped_column(ForeignKey('po_to_vendor.id'), nullable=True)
     invoice_type = Column(String(20), nullable=True)
     invoice_number = Column(String(30), nullable=True)
     invoice_amount = Column(Numeric(10, 2), nullable=False)
+    currency = Column(String(3), nullable=False)
 
     project: Mapped['APProject'] = relationship(back_populates="invoices")
     transactions: Mapped[list['TransactionLog']] = relationship(back_populates="invoice")
+    vendor_po: Mapped['POToVendor'] = relationship(back_populates="project")
 
 class TransactionLog(BaseModel):
     __tablename__ = 'transaction_logs'
