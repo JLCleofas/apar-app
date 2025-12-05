@@ -1,4 +1,6 @@
 from decimal import Decimal
+from locale import currency
+
 from fastapi import APIRouter, Depends, Request, HTTPException, Form, Response
 from models import APProject, Invoice, TransactionLog, POToVendor
 from database import SessionLocal
@@ -77,8 +79,9 @@ async def render_transaction_history_page(request: Request, db: db_dependency, p
 
 @router.get("/record-invoice-page/{project_id}")
 async def render_record_invoice_page(request: Request, db: db_dependency, project_id: int):
+    vendor_po_list = db.query(POToVendor).filter(POToVendor.project_id == project_id).all()
     project_model = db.query(APProject).filter(APProject.id == project_id).first()
-    return templates.TemplateResponse("ap-record-invoice.html", {"request": request, "project":project_model})
+    return templates.TemplateResponse("ap-record-invoice.html", {"request": request, "project":project_model, "vendor_po_list":vendor_po_list})
 
 # TODO: Add page endpoint for Add PO page
 ### Endpoints ###
@@ -160,17 +163,19 @@ async def add_vendor_po(db: db_dependency,
 @router.post("/record-invoice/{project_id}", status_code=status.HTTP_201_CREATED)
 async def add_invoice(db: db_dependency,
                     project_id: int,
-                    vendor_po: str = Form(min_length=14, max_length=14),
-                    invoice_type: str = Form(max_length=20, default=None),
-                    invoice_number: str = Form(max_length=30, default=None),
+                    vendor_po_id: str = Form(...),
+                    invoice_type: str = Form(...),
+                    invoice_number: str = Form(...),
                     invoice_amount: Decimal = Form(Decimal("0"))
                     ):
+    currency = db.query(APProject).filter(APProject.id == project_id).first().currency
     invoice_data = {
         "project_id": project_id,
-        "vendor_po": vendor_po,
+        "vendor_po_id": vendor_po_id,
         "invoice_type": invoice_type,
         "invoice_number": invoice_number,
-        "invoice_amount": invoice_amount
+        "invoice_amount": invoice_amount,
+        "currency": currency
     }
     invoice_model = Invoice(**invoice_data)
     db.add(invoice_model)

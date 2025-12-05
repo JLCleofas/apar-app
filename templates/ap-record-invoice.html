@@ -12,27 +12,14 @@
                       hx-swap="none"
                       hx-trigger="submit delay:200ms">
                     <div class="row">
-                        {# TODO: Remove Vendor PO Number and Vendor column #}
-                        {#  Add to separate 'Add Purchase Order Page' #}
-                        {# Vendor PO Number, vendor column, currency, and po amount #}
-                        {# TODO: Add a dropdown for the lists of PO to vendor #}
                         <div class="col">
-                            <label class="form-label" for="vendor_po">Vendor Purchase Order Number</label>
-                            <input type="text" class="form-control" name="vendor_po">
-                        </div>
-                        <div class="col">
-                            <label class="form-label" for="vendor">Vendor</label>
-                            <input type="text" class="form-control" name="vendor">
-                        </div>
-                        <div class="col">
-                            <label class="form-label" for="currency">Currency</label>
-                            <select class="form-select" name="currency" id="currency">
-                                <option value="PHP">PHP</option>
-                                <option value="USD">USD</option>
+                            <label class="form-label" for="vendor_po_id">Vendor Purchase Order</label>
+                            <select class="form-select" name="vendor_po_id" id="vendor_po_id">
+                                {% for vendor_po in vendor_po_list %}
+                                    <option value="{{ vendor_po.id }}">{{ vendor_po.vendor_po }}</option>
+                                {% endfor %}
                             </select>
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="col">
                             <label class="form-label" for="invoice_type">Invoice Type</label>
                             <select class="form-select" name="invoice_type" id="invoice_type">
