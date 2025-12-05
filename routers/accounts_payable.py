@@ -82,7 +82,7 @@ async def render_record_invoice_page(request: Request, db: db_dependency, projec
 ## TODO: Add report generation
 @router.get("/", status_code=status.HTTP_200_OK)
 async def read_all(db: db_dependency):
-    return db.query(APProject).all()
+    return db.query(APProject).filter(APProject.is_deleted == False).all()
 
 @router.post("/project", status_code=status.HTTP_201_CREATED)
 async def create_project(db: db_dependency, project_request: ProjectRequest):
@@ -135,7 +135,6 @@ async def add_project(
 @router.post("/record-invoice/{project_id}", status_code=status.HTTP_201_CREATED)
 async def add_invoice(db: db_dependency,
                     project_id: int,
-                    vendor: str = Form(min_length=1, max_length=50),
                     vendor_po: str = Form(min_length=14, max_length=14),
                     invoice_type: str = Form(max_length=20, default=None),
                     invoice_number: str = Form(max_length=30, default=None),
@@ -143,7 +142,6 @@ async def add_invoice(db: db_dependency,
                     ):
     invoice_data = {
         "project_id": project_id,
-        "vendor": vendor,
         "vendor_po": vendor_po,
         "invoice_type": invoice_type,
         "invoice_number": invoice_number,
