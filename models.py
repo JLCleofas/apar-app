@@ -37,7 +37,7 @@ class POToVendor(BaseModel):
     po_amount = Column(Numeric(10, 2), nullable=False)
     currency = Column(String(3), nullable=False)
 
-    project: Mapped['APProject'] = relationship(back_populates="")
+    project: Mapped['APProject'] = relationship(back_populates="vendor_po")
     invoice: Mapped['Invoice'] = relationship(back_populates="vendor_po")
 class Invoice(BaseModel):
     __tablename__ = 'invoices'

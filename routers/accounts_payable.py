@@ -1,6 +1,6 @@
 from decimal import Decimal
 from fastapi import APIRouter, Depends, Request, HTTPException, Form, Response
-from models import APProject, Invoice, TransactionLog
+from models import APProject, Invoice, TransactionLog, POToVendor
 from database import SessionLocal
 from typing import Annotated, Optional
 from sqlalchemy.orm import Session
@@ -49,6 +49,7 @@ async def render_ap_page(request: Request, db: db_dependency):
 
     return templates.TemplateResponse("accounts-payable.html", {"request": request, "projects": projects})
 
+# TODO: Add project not found validation
 @router.get("/details/{project_id}")
 async def render_project_details(request: Request, db: db_dependency, project_id: int):
     project_model = db.query(APProject).filter(APProject.id == project_id).first()
@@ -57,6 +58,11 @@ async def render_project_details(request: Request, db: db_dependency, project_id
 @router.get("/add-project-page")
 async def render_add_project_page(request: Request):
     return templates.TemplateResponse("add-project.html", {"request": request})
+
+@router.get("/add-vendor-po-page/{project_id}")
+async def render_add_vendor_po_page(request: Request, db: db_dependency, project_id: int):
+    project_model = db.query(APProject).filter(APProject.id == project_id).first()
+    return templates.TemplateResponse("ap-add-vendor-po.html", {"request": request, "project":project_model})
 
 @router.get("/add-transaction-page/{project_id}")
 async def render_add_transaction_page(request: Request, db: db_dependency, project_id: int):
@@ -132,6 +138,25 @@ async def add_project(
 # TODO: Add error handling for zero invoice amounts
 # TODO: Add error handling for Vendor POs that exceeds Total PO amount
 # TODO: Add error handling for isDeleted column
+
+@router.post("/add-vendor-po/{project_id}", status_code=status.HTTP_201_CREATED)
+async def add_vendor_po(db: db_dependency,
+                        project_id: int,
+                        vendor_po: str = Form(...),
+                        vendor: str = Form(...),
+                        po_amount: Decimal = Form(...),
+                        ):
+    currency = db.query(APProject).filter(APProject.id == project_id).first().currency
+    vendor_po_data = {
+        "project_id": project_id,
+        "vendor_po": vendor_po,
+        "vendor": vendor,
+        "po_amount": po_amount,
+        "currency": currency
+    }
+    vendor_po_model = POToVendor(**vendor_po_data)
+    db.add(vendor_po_model)
+    db.commit()
 @router.post("/record-invoice/{project_id}", status_code=status.HTTP_201_CREATED)
 async def add_invoice(db: db_dependency,
                     project_id: int,

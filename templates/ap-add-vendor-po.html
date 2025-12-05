@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+	{% set active_tab = 'add-vendor-po' %}{% include 'ap-tabs.html' %}
+    <div id="liveAlertPlaceholder"></div>
+    <div class="container">
+    <div class="card mt-3">
+        <div class="card-header">Add Vendor PO</div>
+        <div class="card-body">
+            <form action=""
+                  hx-post="/ap/add-vendor-po/{{ project.id }}"
+                  hx-swap="none"
+                  hx-trigger="submit delay:200ms"
+            >
+                <div class="row">
+                    <div class="col">
+                        <label for="vendor_po" class="form-label">Vendor PO Number</label>
+                        <input type="text" class="form-control" id="vendor_po" name="vendor_po" required>
+                    </div>
+                    <div class="col">
+                        <label for="vendor" class="form-label">Vendor</label>
+                        <input type="text" class="form-control" id="vendor" name="vendor" required>
+                    </div>
+                    <div class="col">
+                        <label for="po_amount" class="form-label">Purchase Order Amount</label>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="basic-addon1">{{ project.currency }}</span>
+                            <input type="number" step="0.01" class="form-control" id="po_amount" name="po_amount" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="row justify-content-end">
+                    <div class="col-1 ps-4">
+                        <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal"
+                    data-bs-target="#staticBackdrop">Add
+                        </button>
+                    </div>
+                    {% include 'modals.html' %}
+                </div>
+            </form>
+        </div>
+    </div>
+    </div>
+{% endblock %}
