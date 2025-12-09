@@ -25,7 +25,7 @@ class APProject(BaseModel):
     balance = Column(Numeric(10, 2))
 
     invoice: Mapped[list['Invoice']] = relationship(back_populates="project")
-    transactions: Mapped[list['TransactionLog']] = relationship(back_populates="project", order_by=lambda: TransactionLog.date_paid)
+    transaction: Mapped[list['Transaction']] = relationship(back_populates="project", order_by=lambda: Transaction.date_paid)
     vendor_po: Mapped[list['POToVendor']] = relationship(back_populates="project")
 # TODO: Add table for PO to vendor
 # TODO: Remove vendor, vendor_po from Invoice
@@ -35,10 +35,12 @@ class POToVendor(BaseModel):
     vendor_po = Column(String(14), nullable=False, unique=True)
     vendor = Column(String(50), nullable=False)
     po_amount = Column(Numeric(10, 2), nullable=False)
+    balance = Column(Numeric(10, 2), nullable=False)
     currency = Column(String(3), nullable=False)
 
     project: Mapped['APProject'] = relationship(back_populates="vendor_po")
     invoice: Mapped['Invoice'] = relationship(back_populates="vendor_po")
+    transaction: Mapped[list['Transaction']] = relationship(back_populates="vendor_po")
 class Invoice(BaseModel):
     __tablename__ = 'invoices'
     project_id: Mapped[int] = mapped_column(ForeignKey('ap_projects.id'), nullable=False)
@@ -49,19 +51,20 @@ class Invoice(BaseModel):
     currency = Column(String(3), nullable=False)
 
     project: Mapped['APProject'] = relationship(back_populates="invoice")
-    transactions: Mapped[list['TransactionLog']] = relationship(back_populates="invoice")
+    transaction: Mapped[list['Transaction']] = relationship(back_populates="invoice")
     vendor_po: Mapped['POToVendor'] = relationship(back_populates="invoice")
 
-class TransactionLog(BaseModel):
-    __tablename__ = 'transaction_logs'
+class Transaction(BaseModel):
+    __tablename__ = 'transactions'
 
     project_id: Mapped[int] = mapped_column(ForeignKey('ap_projects.id'), nullable=False)
     invoice_id: Mapped[int] = mapped_column(ForeignKey('invoices.id'), nullable=False)
+    vendor_po_id: Mapped[int] = mapped_column(ForeignKey('po_to_vendor.id'), nullable=True)
 
-    document_type = Column(String(20), nullable=True)
     transaction_amount = Column(Numeric(10, 2), nullable=False)
     date_paid = Column(Date, nullable=False)
     dv_reference = Column(String(11), nullable=True)
 
-    invoice: Mapped['Invoice'] = relationship(back_populates="transactions")
-    project: Mapped['APProject'] = relationship(back_populates="transactions")
+    invoice: Mapped['Invoice'] = relationship(back_populates="transaction")
+    project: Mapped['APProject'] = relationship(back_populates="transaction")
+    vendor_po: Mapped['POToVendor'] = relationship(back_populates="transaction")

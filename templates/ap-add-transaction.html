@@ -1,98 +1,81 @@
 {% extends "base.html" %}
 {% block content %}{% set active_tab = 'add-transaction' %}
-{% include 'ap-tabs.html' %}
-{#    Add Transaction#}
-<div class="container">
-    <div class="card mt-3">
-        <div class="card-header">Add transaction</div>
-        <div class="card-body">
-{#            TODO: Add a dropdown to select from the issued invoice table#}
-{#            This will be the invoice number#}
-            <form hx-post="/ap/project/{{ project.id }}"
-                  hx-swap="none"
-                  hx-trigger="submit delay:200ms">
-                <div class="row">
-                    {#
-                    <div class="col">#}
-                        {# <label class="form-label">Category</label>#}
-                        {# <select class="form-select" name="category" id="">#}
-                            {#
-                            <option value="cloud-mr">Cloud-MR</option>
-                            #}
-                            {#
-                            <option value="cloud-nr">Cloud-NR</option>
-                            #}
-                            {#
-                            <option value="si-oth-mr">SI-OTH-MR</option>
-                            #}
-                            {#
-                            <option value="si-oth-nr">SI-OTH-NR</option>
-                            #}
-                            {#
-                            <option value="si-rpa-mr">SI-RPA-MR</option>
-                            #}
-                            {#
-                            <option value="cloud-oth-mr">Cloud-OTH-MR</option>
-                            #}
-                            {#
-                            <option value="cloud-oth-nr">Cloud-OTH-NR</option>
-                            #}
-                            {#
-                            <option value="cloud-iaas-nr">Cloud-IAAS-NR</option>
-                            #}
-                            {#
-                            <option value="cloud-saas-nr">Cloud-SAAS-NR</option>
-                            #}
-                            {#
-                            <option value="iot-nr">IOT-NR</option>
-                            #}
-                            {# </select>#}
-                        {#
+    {% include 'ap-tabs.html' %}
+    {#    Add Transaction#}
+    <div class="container">
+        <div class="card mt-3">
+            <div class="card-header">Add transaction</div>
+            <div class="card-body">
+                {#            TODO: Add HTMX hx-get to new endpoint to get invoice data then display below the details#}
+                <form hx-post="/ap/add-transaction/{{ project.id }}"
+                      hx-swap="none"
+                      hx-trigger="submit delay:200ms">
+                    <div class="row">
+                        <div class="col">
+                            <label class="form-label">Invoice Number</label>
+                                <select class="form-select" name="invoice_id" id="">
+                                    <option selected disabled value="">Select Invoice</option>
+                                    {% for invoice in invoice_list %}
+                                    <option value="{{ invoice.id }}">{{ invoice.invoice_number }}</option>
+                                    {% endfor %}
+                                </select>
+                        </div>
                     </div>
-                    #}
-                    <div class="col">
-                        <label class="form-label">Document Type</label>
-                        <select class="form-select" name="document_type" id="">
-                            <option value="Sales Invoice">Sales Invoice</option>
-                            <option value="Service Invoice">Service Invoice</option>
-                            <option value="B Invoice">B Invoice</option>
-                            <option value="INV">INV</option>
-                            <option value="BS">BS</option>
-                        </select>
+{#                    <div class="row">#}
+{##}
+{#                        <div class="col">#}
+{#                            <label class="form-label">Invoice Type</label>#}
+{#                            <input type="text" class="form-control" value="{{ invoice.invoice_type }}"#}
+{#                                   name="invoice_type" id="" disabled>#}
+{#                        </div>#}
+{#                        <div class="col">#}
+{#                            <label class="form-label">Invoice Number</label>#}
+{#                            <input type="text" class="form-control" value="{{ invoice.invoice_number }}"#}
+{#                                   name="invoice_number" id="" disabled>#}
+{#                        </div>#}
+{#                        <div class="col">#}
+{#                            <label class="form-label">Invoice Amount</label>#}
+{#                            <input type="number" step="0.01" class="form-control"#}
+{#                                   value="{{ invoice.invoice_amount }}" name="invoice_amount" id="" disabled>#}
+{#                        </div>#}
+{#                    </div>#}
+                    <div class="row">
+                        <div class="col">
+                            <label class="form-label">Date Paid</label>
+                            <input
+                                    type="date"
+                                    class="form-control"
+                                    value="{{ project.date_paid }}"
+                                    name="date_paid"
+                                    id=""
+                            />
+                        </div>
+                        <div class="col">
+                            <label class="form-label">DV Reference</label>
+                            <input type="text" class="form-control" placeholder="DV25-12-345"
+                                   name="dv_reference"
+                                   id="">
+                        </div>
+                        <div class="col">
+                            <label class="form-label">Transaction Amount</label>
+                            <input type="number" step="0.01" class="form-control" placeholder="0.00"
+                                   name="transaction_amount"
+                                   id="">
+                        </div>
                     </div>
-                    <div class="col">
-                        <label class="form-label">Payment Amount</label>
-                        <input type="number" step="0.01" class="form-control" placeholder="0.00" name="transaction_amount"
-                               id="">
+                    <div class="row justify-content-end">
+                        <div class="col-1">
+                            <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal"
+                                    data-bs-target="#staticBackdrop">Submit
+                            </button>
+                        </div>
+                        <div class="col-1">
+                            <button type="reset" class="btn btn-secondary mt-3">Reset</button>
+                        </div>
                     </div>
-                    <div class="col">
-                        <label class="form-label">DV Reference</label>
-                        <input type="text" class="form-control" placeholder="DV25-12-345" name="dv_reference" id="">
-                    </div>
-                    <div class="col">
-                        <label class="form-label">Date Paid</label>
-                        <input
-                                type="date"
-                                class="form-control"
-                                value="{{ project.date_paid }}"
-                                name="date_paid"
-                                id=""
-                        />
-                    </div>
-                </div>
-                <div class="row justify-content-end">
-                    <div class="col-1">
-                        <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal"
-                                data-bs-target="#staticBackdrop">Submit
-                        </button>
-                    </div>
-                    <div class="col-1">
-                        <button type="reset" class="btn btn-secondary mt-3">Reset</button>
-                    </div>
-                </div>
-                {% include 'modals.html' %}
-            </form>
+                    {% include 'modals.html' %}
+                </form>
+            </div>
         </div>
     </div>
-</div>
 {% endblock %}
