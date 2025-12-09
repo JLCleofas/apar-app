@@ -1,0 +1,23 @@
+<ul class="nav nav-tabs">
+    <li class="nav-item">
+        <a class="nav-link {{ 'active' if active_tab == 'details' }}" aria-current="page"
+           href="/ap/details/{{ project.id }}">Project Details</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {{ 'active' if active_tab == 'add-vendor-po' }}" aria-current="page"
+           href="/ap/add-vendor-po-page/{{ project.id }}">Add Vendor PO</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {{ 'active' if active_tab == 'record-invoice' }}" aria-current="page"
+           href="/ap/record-invoice-page/{{ project.id }}">Record Invoice</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {{ 'active' if active_tab == 'add-transaction' }}" aria-current="page"
+           href="/ap/add-transaction-page/{{ project.id }}">Add Transaction</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {{ 'active' if active_tab == 'transaction-history' }}" aria-current="page"
+           href="/ap/transaction-history-page/{{ project.id }}">Transaction History</a>
+    </li>
+
+</ul>

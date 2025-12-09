@@ -6,6 +6,7 @@
             <div class="card-header text-center">Add New Project</div>
             <div class="card-body">
                 <h5 class="card-title">Project Details</h5>
+{#                TODO: Add required fields#}
                 <form action=""
                       hx-post="/ap/add-project"
                       hx-swap="none"
@@ -13,12 +14,12 @@
                 >
                     <div class="row">
                         <div class="col">
-                            <label class="form-label">Project Name</label>
+                            <label class="form-label" for="client">Client</label>
                             <input
                                     type="text"
                                     class="form-control"
-                                    placeholder="Name of Project"
-                                    name="project_name"
+                                    placeholder="Name of client"
+                                    name="client"
                                     id=""
                             />
                         </div>
@@ -42,53 +43,23 @@
                                     id=""
                             />
                         </div>
-                        <div class="col">
-                            <label class="form-label">Vendor Purchase Order</label>
-                            <input
-                                    type="text"
-                                    class="form-control"
-                                    placeholder="PKPH-1234-5678"
-                                    name="vendor_po"
-                                    id=""
-                            />
-                        </div>
                     </div>
                     <div class="row">
-                        <div class="col">
-                            <label class="form-label">Supplier</label>
-                            <input
-                                    type="text"
-                                    class="form-control"
-                                    placeholder="Name of Supplier"
-                                    name="supplier"
-                                    id=""
-                            />
-                        </div>
-                        <div class="col">
-                            <label class="form-label">Invoice Number</label>
-                            <input
-                                    type="text"
-                                    class="form-control"
-                                    placeholder="123456789"
-                                    name="invoice_number"
-                                    id=""
-                            />
-                        </div>
-                        <div class="col">
-                            <label class="form-label">Currency</label>
-                            <select class="form-select" name="currency" id="">
+                        <div class="col-2">
+                            <label class="form-label" for="currency">Currency</label>
+                            <select class="form-select" name="currency" id="currency">
                                 <option value="PHP">PHP</option>
                                 <option value="USD">USD</option>
                             </select>
                         </div>
-                        <div class="col">
-                            <label class="form-label">Purchase Order Amount</label>
+                        <div class="col-3">
+                            <label class="form-label" for="total_po_amount">Total Purchase Order Amount</label>
                             <input
                                     type="number"
                                     step="0.01"
                                     class="form-control"
                                     placeholder="0.00"
-                                    name="po_amount"
+                                    name="total_po_amount"
                                     id=""
                             />
                         </div>
