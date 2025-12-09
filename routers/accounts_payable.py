@@ -60,7 +60,8 @@ async def render_ap_page(request: Request, db: db_dependency):
 @router.get("/details/{project_id}")
 async def render_project_details(request: Request, db: db_dependency, project_id: int):
     project_model = db.query(APProject).filter(APProject.id == project_id).first()
-    return templates.TemplateResponse("ap-details.html", {"request": request, "project": project_model})
+    vendor_po_list = db.query(POToVendor).filter(POToVendor.project_id == project_id).all()
+    return templates.TemplateResponse("ap-details.html", {"request": request, "project": project_model, "vendor_po_list": vendor_po_list})
 
 
 @router.get("/add-project-page")
