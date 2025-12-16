@@ -57,6 +57,7 @@ async def render_ap_page(request: Request, db: db_dependency):
 
 
 # TODO: Add project not found validation
+# TODO: Add filter for is_deleted == False
 @router.get("/details/{project_id}")
 async def render_project_details(request: Request, db: db_dependency, project_id: int):
     project_model = db.query(APProject).filter(APProject.id == project_id).first()
@@ -97,6 +98,13 @@ async def render_record_invoice_page(request: Request, db: db_dependency, projec
     project_model = db.query(APProject).filter(APProject.id == project_id).first()
     return templates.TemplateResponse("ap-record-invoice.html",
                                       {"request": request, "project": project_model, "vendor_po_list": vendor_po_list})
+
+@router.get("/vendor-po-details-page/{vendor_po_id}")
+async def render_vendor_po_page(request: Request, db: db_dependency, vendor_po_id: int):
+    vendor_po_model = db.query(POToVendor).filter(POToVendor.is_deleted == False).filter(POToVendor.id == vendor_po_id).first()
+    invoice_list = db.query(Invoice).filter(Invoice.is_deleted == False).filter(Invoice.vendor_po_id == vendor_po_id).all()
+
+    return templates.TemplateResponse("ap-vendor-po-details.html", {"request": request, "po_to_vendor": vendor_po_model, "invoices": invoice_list})
 
 
 # TODO: Add page endpoint for Add PO page
