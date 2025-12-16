@@ -1,0 +1,48 @@
+{%  extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="card mt-3">
+        <div class="card-header"> Vendor Purchase Order Details </div>
+        <div class="card-body">
+            <form>
+                <div class="row">
+                    <div class="col">
+                        <label class="form-label" for="vendor_po">Vendor PO Number</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            value="{{ po_to_vendor.vendor_po }}"
+                            name="vendor_po"
+                            id="vendor_po"
+                            readonly
+                        >
+                    </div>
+                    <div class="col">
+                        <label class="form-label" for="vendor">Vendor</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            value="{{ po_to_vendor.vendor }}"
+                            name="vendor"
+                            id="vendor"
+                            readonly
+                            >
+                    </div>
+                    <div class="col">
+                        <label class="form-label" for="po_amount">Purchase Order Amount</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            value="{{ po_to_vendor.po_amount }}"
+                            name="po_amount"
+                            id="po_amount"
+                            readonly
+                        >
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
