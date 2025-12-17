@@ -60,7 +60,7 @@
                     <tr>
                         <td>{{ invoice.invoice_type }}</td>
                         <td>{{ invoice.invoice_number }}</td>
-                        <td>{{ invoice.invoice_amount }}</td>
+                        <td>{{ invoice.currency }} {{ invoice.invoice_amount }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
