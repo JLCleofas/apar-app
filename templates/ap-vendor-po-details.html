@@ -44,5 +44,28 @@
             </form>
         </div>
     </div>
+    <div class="card mt-3">
+        <div class="card-header">Recorded Invoices</div>
+        <div class="card-body">
+            <table class="table table-header">
+                <thead>
+                    <tr>
+                        <th>Invoice Type</th>
+                        <th>Invoice Number</th>
+                        <th>Invoice Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for invoice in invoices %}
+                    <tr>
+                        <td>{{ invoice.invoice_type }}</td>
+                        <td>{{ invoice.invoice_number }}</td>
+                        <td>{{ invoice.invoice_amount }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 {% endblock %}
