@@ -7,6 +7,8 @@
             <div class="card-header">Record Invoice</div>
             <div class="card-body">
                 {# TODO: Disable submit action when Enter key is pressed. #}
+{#                TODO: Add Accounting Type(?) column (Inventory, etc.)#}
+{#                TODO: Add taxes column (VAT, EWT, etc.)#}
                 <form action=""
                       hx-post="/ap/record-invoice/{{ project.id }}"
                       hx-swap="none"
