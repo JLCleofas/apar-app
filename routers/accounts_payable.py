@@ -84,8 +84,10 @@ async def render_add_vendor_po_page(request: Request, db: db_dependency, project
 
 @router.get("/add-transaction-page/{project_id}")
 async def render_add_transaction_page(request: Request, db: db_dependency, project_id: int):
-    invoice_list = db.query(Invoice).filter(Invoice.project_id == project_id).all()
+    invoice_list = db.query(Invoice).filter(Invoice.project_id == project_id).filter(Invoice.is_deleted == False).all()
     project_model = db.query(APProject).filter(APProject.id == project_id).first()
+    if project_model is None:
+        raise HTTPException(status_code=404, detail='Project not found')
     return templates.TemplateResponse("ap-add-transaction.html",
                                       {"request": request, "project": project_model, "invoice_list": invoice_list})
 
