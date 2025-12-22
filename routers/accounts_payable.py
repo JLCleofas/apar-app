@@ -75,6 +75,10 @@ async def render_add_project_page(request: Request):
 @router.get("/add-vendor-po-page/{project_id}")
 async def render_add_vendor_po_page(request: Request, db: db_dependency, project_id: int):
     project_model = db.query(APProject).filter(APProject.id == project_id).first()
+
+    if project_model is None:
+        raise HTTPException(status_code=404, detail='Project not found')
+
     return templates.TemplateResponse("ap-add-vendor-po.html", {"request": request, "project": project_model})
 
 
