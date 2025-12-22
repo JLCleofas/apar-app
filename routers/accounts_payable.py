@@ -95,6 +95,10 @@ async def render_add_transaction_page(request: Request, db: db_dependency, proje
 @router.get("/transaction-history-page/{project_id}")
 async def render_transaction_history_page(request: Request, db: db_dependency, project_id: int):
     project_model = db.query(APProject).filter(APProject.id == project_id).first()
+
+    if project_model is None:
+        raise HTTPException(status_code=404, detail='Project not found')
+
     transaction_logs = db.query(Transaction).filter(Transaction.project_id == project_id).all()
     return templates.TemplateResponse("ap-transaction-history.html",
                                       {"request": request, "project": project_model, "transactions": transaction_logs})
