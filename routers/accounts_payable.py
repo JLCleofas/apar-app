@@ -63,7 +63,7 @@ async def render_project_details(request: Request, db: db_dependency, project_id
     if project_model is None:
         return templates.TemplateResponse("not-found.html", {"request": request})
 
-    vendor_po_list = db.query(POToVendor).filter(POToVendor.project_id == project_id).filter(POToVendor.is_deleted).all()
+    vendor_po_list = db.query(POToVendor).filter(POToVendor.project_id == project_id).filter(POToVendor.is_deleted == False).all()
     return templates.TemplateResponse("ap-details.html", {"request": request, "project": project_model, "vendor_po_list": vendor_po_list})
 
 
@@ -77,7 +77,7 @@ async def render_add_vendor_po_page(request: Request, db: db_dependency, project
     project_model = db.query(APProject).filter(APProject.id == project_id).first()
 
     if project_model is None:
-        raise HTTPException(status_code=404, detail='Project not found')
+        return templates.TemplateResponse("not-found.html", {"request": request})
 
     return templates.TemplateResponse("ap-add-vendor-po.html", {"request": request, "project": project_model})
 
@@ -87,7 +87,7 @@ async def render_add_transaction_page(request: Request, db: db_dependency, proje
     invoice_list = db.query(Invoice).filter(Invoice.project_id == project_id).filter(Invoice.is_deleted == False).all()
     project_model = db.query(APProject).filter(APProject.id == project_id).first()
     if project_model is None:
-        raise HTTPException(status_code=404, detail='Project not found')
+        return templates.TemplateResponse("not-found.html", {"request": request})
     return templates.TemplateResponse("ap-add-transaction.html",
                                       {"request": request, "project": project_model, "invoice_list": invoice_list})
 
@@ -97,7 +97,7 @@ async def render_transaction_history_page(request: Request, db: db_dependency, p
     project_model = db.query(APProject).filter(APProject.id == project_id).first()
 
     if project_model is None:
-        raise HTTPException(status_code=404, detail='Project not found')
+        return templates.TemplateResponse("not-found.html", {"request": request})
 
     transaction_logs = db.query(Transaction).filter(Transaction.project_id == project_id).all()
     return templates.TemplateResponse("ap-transaction-history.html",
@@ -108,12 +108,20 @@ async def render_transaction_history_page(request: Request, db: db_dependency, p
 async def render_record_invoice_page(request: Request, db: db_dependency, project_id: int):
     vendor_po_list = db.query(POToVendor).filter(POToVendor.project_id == project_id).all()
     project_model = db.query(APProject).filter(APProject.id == project_id).first()
+
+    if project_model is None:
+        return templates.TemplateResponse("not-found.html", {"request": request})
+
     return templates.TemplateResponse("ap-record-invoice.html",
                                       {"request": request, "project": project_model, "vendor_po_list": vendor_po_list})
 
 @router.get("/vendor-po-details-page/{vendor_po_id}")
 async def render_vendor_po_page(request: Request, db: db_dependency, vendor_po_id: int):
     vendor_po_model = db.query(POToVendor).filter(POToVendor.is_deleted == False).filter(POToVendor.id == vendor_po_id).first()
+
+    if vendor_po_model is None:
+        return templates.TemplateResponse("not-found.html", {"request": request})
+
     invoice_list = db.query(Invoice).filter(Invoice.is_deleted == False).filter(Invoice.vendor_po_id == vendor_po_id).all()
 
     return templates.TemplateResponse("ap-vendor-po-details.html", {"request": request, "po_to_vendor": vendor_po_model, "invoices": invoice_list})
