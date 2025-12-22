@@ -51,17 +51,19 @@ def redirect_to_projects_page():
 ### Pages ###
 @router.get("/projects")
 async def render_ap_page(request: Request, db: db_dependency):
-    projects = db.query(APProject).all()
+    projects = db.query(APProject).filter(APProject.is_deleted == False).all()
 
     return templates.TemplateResponse("accounts-payable.html", {"request": request, "projects": projects})
 
 
-# TODO: Add project not found validation
-# TODO: Add filter for is_deleted == False
 @router.get("/details/{project_id}")
 async def render_project_details(request: Request, db: db_dependency, project_id: int):
-    project_model = db.query(APProject).filter(APProject.id == project_id).first()
-    vendor_po_list = db.query(POToVendor).filter(POToVendor.project_id == project_id).all()
+    project_model = db.query(APProject).filter(APProject.id == project_id).filter(APProject.is_deleted == False).first()
+
+    if project_model is None:
+        return templates.TemplateResponse("not-found.html", {"request": request})
+
+    vendor_po_list = db.query(POToVendor).filter(POToVendor.project_id == project_id).filter(POToVendor.is_deleted == False).all()
     return templates.TemplateResponse("ap-details.html", {"request": request, "project": project_model, "vendor_po_list": vendor_po_list})
 
 
@@ -73,13 +75,19 @@ async def render_add_project_page(request: Request):
 @router.get("/add-vendor-po-page/{project_id}")
 async def render_add_vendor_po_page(request: Request, db: db_dependency, project_id: int):
     project_model = db.query(APProject).filter(APProject.id == project_id).first()
+
+    if project_model is None:
+        return templates.TemplateResponse("not-found.html", {"request": request})
+
     return templates.TemplateResponse("ap-add-vendor-po.html", {"request": request, "project": project_model})
 
 
 @router.get("/add-transaction-page/{project_id}")
 async def render_add_transaction_page(request: Request, db: db_dependency, project_id: int):
-    invoice_list = db.query(Invoice).filter(Invoice.project_id == project_id).all()
+    invoice_list = db.query(Invoice).filter(Invoice.project_id == project_id).filter(Invoice.is_deleted == False).all()
     project_model = db.query(APProject).filter(APProject.id == project_id).first()
+    if project_model is None:
+        return templates.TemplateResponse("not-found.html", {"request": request})
     return templates.TemplateResponse("ap-add-transaction.html",
                                       {"request": request, "project": project_model, "invoice_list": invoice_list})
 
@@ -87,6 +95,10 @@ async def render_add_transaction_page(request: Request, db: db_dependency, proje
 @router.get("/transaction-history-page/{project_id}")
 async def render_transaction_history_page(request: Request, db: db_dependency, project_id: int):
     project_model = db.query(APProject).filter(APProject.id == project_id).first()
+
+    if project_model is None:
+        return templates.TemplateResponse("not-found.html", {"request": request})
+
     transaction_logs = db.query(Transaction).filter(Transaction.project_id == project_id).all()
     return templates.TemplateResponse("ap-transaction-history.html",
                                       {"request": request, "project": project_model, "transactions": transaction_logs})
@@ -96,18 +108,25 @@ async def render_transaction_history_page(request: Request, db: db_dependency, p
 async def render_record_invoice_page(request: Request, db: db_dependency, project_id: int):
     vendor_po_list = db.query(POToVendor).filter(POToVendor.project_id == project_id).all()
     project_model = db.query(APProject).filter(APProject.id == project_id).first()
+
+    if project_model is None:
+        return templates.TemplateResponse("not-found.html", {"request": request})
+
     return templates.TemplateResponse("ap-record-invoice.html",
                                       {"request": request, "project": project_model, "vendor_po_list": vendor_po_list})
 
 @router.get("/vendor-po-details-page/{vendor_po_id}")
 async def render_vendor_po_page(request: Request, db: db_dependency, vendor_po_id: int):
     vendor_po_model = db.query(POToVendor).filter(POToVendor.is_deleted == False).filter(POToVendor.id == vendor_po_id).first()
+
+    if vendor_po_model is None:
+        return templates.TemplateResponse("not-found.html", {"request": request})
+
     invoice_list = db.query(Invoice).filter(Invoice.is_deleted == False).filter(Invoice.vendor_po_id == vendor_po_id).all()
 
     return templates.TemplateResponse("ap-vendor-po-details.html", {"request": request, "po_to_vendor": vendor_po_model, "invoices": invoice_list})
 
 
-# TODO: Add page endpoint for Add PO page
 ### Endpoints ###
 
 ## TODO: Add delete project endpoint
@@ -116,23 +135,6 @@ async def render_vendor_po_page(request: Request, db: db_dependency, vendor_po_i
 @router.get("/", status_code=status.HTTP_200_OK)
 async def read_all(db: db_dependency):
     return db.query(APProject).filter(APProject.is_deleted == False).all()
-
-
-@router.post("/project", status_code=status.HTTP_201_CREATED)
-async def create_project(db: db_dependency, project_request: ProjectRequest):
-    project_data = project_request.model_dump()
-
-    try:
-        po_amount = project_data['po_amount']
-        invoice_amount = project_data['invoice_amount']
-        project_data['balance'] = po_amount - invoice_amount
-    except (ValueError, TypeError):
-        project_data['balance'] = 0
-
-    project_model = APProject(**project_data)
-    db.add(project_model)
-    db.commit()
-
 
 @router.post("/add-project", status_code=status.HTTP_201_CREATED)
 async def add_project(
@@ -270,3 +272,17 @@ async def add_transaction(response: Response,
     db.commit()
 
     response.headers["HX-Redirect"] = f"/ap/details/{project_model.id}"
+
+
+@router.put("/delete-project/{project_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_project(db: db_dependency, project_id: int):
+
+    project_model = db.query(APProject).filter(APProject.id == project_id).filter(APProject.is_deleted == False).first()
+
+    if project_model is None:
+        raise HTTPException(status_code=404, detail='Project not found')
+
+    project_model.is_deleted = True
+
+    db.add(project_model)
+    db.commit()
