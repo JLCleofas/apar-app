@@ -51,7 +51,7 @@ def redirect_to_projects_page():
 ### Pages ###
 @router.get("/projects")
 async def render_ap_page(request: Request, db: db_dependency):
-    projects = db.query(APProject).all()
+    projects = db.query(APProject).filter(APProject.is_deleted == False).all()
 
     return templates.TemplateResponse("accounts-payable.html", {"request": request, "projects": projects})
 
@@ -107,7 +107,6 @@ async def render_vendor_po_page(request: Request, db: db_dependency, vendor_po_i
     return templates.TemplateResponse("ap-vendor-po-details.html", {"request": request, "po_to_vendor": vendor_po_model, "invoices": invoice_list})
 
 
-# TODO: Add page endpoint for Add PO page
 ### Endpoints ###
 
 ## TODO: Add delete project endpoint
@@ -116,23 +115,6 @@ async def render_vendor_po_page(request: Request, db: db_dependency, vendor_po_i
 @router.get("/", status_code=status.HTTP_200_OK)
 async def read_all(db: db_dependency):
     return db.query(APProject).filter(APProject.is_deleted == False).all()
-
-
-@router.post("/project", status_code=status.HTTP_201_CREATED)
-async def create_project(db: db_dependency, project_request: ProjectRequest):
-    project_data = project_request.model_dump()
-
-    try:
-        po_amount = project_data['po_amount']
-        invoice_amount = project_data['invoice_amount']
-        project_data['balance'] = po_amount - invoice_amount
-    except (ValueError, TypeError):
-        project_data['balance'] = 0
-
-    project_model = APProject(**project_data)
-    db.add(project_model)
-    db.commit()
-
 
 @router.post("/add-project", status_code=status.HTTP_201_CREATED)
 async def add_project(
@@ -270,3 +252,17 @@ async def add_transaction(response: Response,
     db.commit()
 
     response.headers["HX-Redirect"] = f"/ap/details/{project_model.id}"
+
+
+@router.put("/delete-project/{project_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_project(db: db_dependency, project_id: int):
+
+    project_model = db.query(APProject).filter(APProject.id == project_id).filter(APProject.is_deleted == False).first()
+
+    if project_model is None:
+        raise HTTPException(status_code=404, detail='Project not found')
+
+    project_model.is_deleted = True
+
+    db.add(project_model)
+    db.commit()
