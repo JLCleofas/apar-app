@@ -56,11 +56,13 @@ async def render_ap_page(request: Request, db: db_dependency):
     return templates.TemplateResponse("accounts-payable.html", {"request": request, "projects": projects})
 
 
-# TODO: Add project not found validation
-# TODO: Add filter for is_deleted == False
 @router.get("/details/{project_id}")
 async def render_project_details(request: Request, db: db_dependency, project_id: int):
-    project_model = db.query(APProject).filter(APProject.id == project_id).first()
+    project_model = db.query(APProject).filter(APProject.id == project_id).filter(APProject.is_deleted == False).first()
+
+    if project_model is None:
+        raise HTTPException(status_code=404, detail="Project not found")
+
     vendor_po_list = db.query(POToVendor).filter(POToVendor.project_id == project_id).all()
     return templates.TemplateResponse("ap-details.html", {"request": request, "project": project_model, "vendor_po_list": vendor_po_list})
 
