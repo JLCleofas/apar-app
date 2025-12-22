@@ -61,7 +61,7 @@ async def render_project_details(request: Request, db: db_dependency, project_id
     project_model = db.query(APProject).filter(APProject.id == project_id).filter(APProject.is_deleted == False).first()
 
     if project_model is None:
-        raise HTTPException(status_code=404, detail="Project not found")
+        return templates.TemplateResponse("not-found.html", {"request": request})
 
     vendor_po_list = db.query(POToVendor).filter(POToVendor.project_id == project_id).filter(POToVendor.is_deleted).all()
     return templates.TemplateResponse("ap-details.html", {"request": request, "project": project_model, "vendor_po_list": vendor_po_list})
