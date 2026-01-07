@@ -158,6 +158,9 @@ async def add_project(
         "balance": total_po_amount,
     }
 
+    if total_po_amount <= 0:
+        raise HTTPException(status_code=409, detail="Total PO amount must be greater than 0")
+
     project_model = APProject(**project_data)
     db.add(project_model)
     db.commit()
