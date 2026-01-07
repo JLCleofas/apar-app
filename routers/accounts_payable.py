@@ -174,7 +174,8 @@ async def add_project(
 # TODO: Add error handling for isDeleted column
 
 @router.post("/add-vendor-po/{project_id}", status_code=status.HTTP_201_CREATED)
-async def add_vendor_po(db: db_dependency,
+async def add_vendor_po(response: Response,
+                        db: db_dependency,
                         project_id: int,
                         vendor_po: str = Form(...),
                         vendor: str = Form(...),
@@ -198,6 +199,9 @@ async def add_vendor_po(db: db_dependency,
     vendor_po_model = POToVendor(**vendor_po_data)
     db.add(vendor_po_model)
     db.commit()
+
+    response.headers["HX-Redirect"] = f"/ap/details/{project_id}"
+    return None
 
 
 @router.post("/record-invoice/{project_id}", status_code=status.HTTP_201_CREATED)
