@@ -166,7 +166,6 @@ async def add_project(
     return None
 
 
-# TODO: Add error handling for duplicate invoice
 # TODO: Add error handling for invoices that exceed PO amount
 # TODO: Add error handling for negative invoice amounts
 # TODO: Add error handling for zero invoice amounts
@@ -191,10 +190,12 @@ async def add_vendor_po(response: Response,
         "balance": po_amount
     }
 
-    existing_vendor_po = db.query(POToVendor).filter(POToVendor.vendor_po == vendor_po).first()
+    existing_vendor_po = db.query(POToVendor).filter(POToVendor.vendor_po == vendor_po).filter(POToVendor.is_deleted == False).first()
 
     if existing_vendor_po:
         raise HTTPException(status_code=409, detail="Vendor already exists")
+
+
 
     vendor_po_model = POToVendor(**vendor_po_data)
     db.add(vendor_po_model)
@@ -261,6 +262,7 @@ async def add_transaction(response: Response,
     ## TODO: Add condition to subtract only if DV-Reference is not None.
     ## TODO: Add error handling when balance is lower than invoice amount.
     ## TODO: Add error handling to prevent negative balance.
+    # TODO: If transaction amount == invoice amount, soft delete the invoice
         project_model.balance -= transaction_amount
         vendor_po_model.balance -= transaction_amount
         project_model.total_paid += transaction_amount
