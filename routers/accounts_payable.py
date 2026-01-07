@@ -195,7 +195,8 @@ async def add_vendor_po(response: Response,
     if existing_vendor_po:
         raise HTTPException(status_code=409, detail="Vendor already exists")
 
-
+    if po_amount <= 0:
+        raise HTTPException(status_code=422, detail="PO amount must be greater than 0")
 
     vendor_po_model = POToVendor(**vendor_po_data)
     db.add(vendor_po_model)

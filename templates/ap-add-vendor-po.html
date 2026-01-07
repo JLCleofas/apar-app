@@ -3,6 +3,7 @@
 {% block content %}
 	{% set active_tab = 'add-vendor-po' %}{% include 'ap-tabs.html' %}
     <div id="liveAlertVendorPOExists"></div>
+
     <div id="liveAlertPlaceholder"></div>
     <div class="container">
     <div class="card mt-3">
@@ -44,28 +45,28 @@
         </div>
     </div>
     </div>
-    <script>
-        const alertPlaceholder = document.getElementById('liveAlertVendorPOExists')
-        const appendAlert = (message, type) => {
-            const wrapper = document.createElement('div')
-            wrapper.innerHTML = [
-                `<div class="alert alert-${type} alert-dismissible" role="alert">`,
-                `   <div>${message}</div>`,
-                '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
-                '</div>'
-            ].join('')
-
-            alertPlaceholder.append(wrapper)
-        }
-
-        document.body.addEventListener('htmx:beforeSwap', function (evt) {
-            // Check if the response status is 409 (Forbidden)
-            if (evt.detail.xhr.status === 409) {
-                // Stop HTMX from trying to swap any content
-                evt.detail.shouldSwap = false;
-                // Trigger the alert
-                appendAlert('Failed to add Vendor PO: Purchase Order already exists', 'danger');
-            }
-        });
-    </script>
+{#    <script>#}
+{#        const alertPlaceholder = document.getElementById('liveAlertVendorPOExists')#}
+{#        const appendAlert = (message, type) => {#}
+{#            const wrapper = document.createElement('div')#}
+{#            wrapper.innerHTML = [#}
+{#                `<div class="alert alert-${type} alert-dismissible" role="alert">`,#}
+{#                `   <div>${message}</div>`,#}
+{#                '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',#}
+{#                '</div>'#}
+{#            ].join('')#}
+{##}
+{#            alertPlaceholder.append(wrapper)#}
+{#        }#}
+{##}
+{#        document.body.addEventListener('htmx:beforeSwap', function (evt) {#}
+{#            // Check if the response status is 409 (Forbidden)#}
+{#            if (evt.detail.xhr.status === 409) {#}
+{#                // Stop HTMX from trying to swap any content#}
+{#                evt.detail.shouldSwap = false;#}
+{#                // Trigger the alert#}
+{#                appendAlert('Failed to add Vendor PO: Purchase Order already exists', 'danger');#}
+{#            }#}
+{#        });#}
+{#    </script>#}
 {% endblock %}
