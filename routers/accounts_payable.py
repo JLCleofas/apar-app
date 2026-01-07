@@ -129,7 +129,6 @@ async def render_vendor_po_page(request: Request, db: db_dependency, vendor_po_i
 
 ### Endpoints ###
 
-## TODO: Add delete project endpoint
 ## TODO: Add search functionality
 ## TODO: Add report generation
 @router.get("/", status_code=status.HTTP_200_OK)
@@ -190,6 +189,12 @@ async def add_vendor_po(db: db_dependency,
         "currency": currency,
         "balance": po_amount
     }
+
+    existing_vendor_po = db.query(POToVendor).filter(POToVendor.vendor_po == vendor_po).first()
+
+    if existing_vendor_po:
+        raise HTTPException(status_code=409, detail="Vendor already exists")
+
     vendor_po_model = POToVendor(**vendor_po_data)
     db.add(vendor_po_model)
     db.commit()
