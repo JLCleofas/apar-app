@@ -146,8 +146,8 @@ async def add_project(
         currency: str = Form(...),
         total_po_amount: Decimal = Form(...)
 ):
-    if db.query(APProject).filter(APProject.quotation == quotation).filter(APProject.is_deleted == False).first() is not None:
-
+    existing_project = db.query(APProject).filter(APProject.quotation == quotation).filter(APProject.is_deleted == False).first()
+    if existing_project:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Project already exists")
     project_data = {
         "client": client,
