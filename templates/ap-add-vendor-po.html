@@ -2,13 +2,12 @@
 
 {% block content %}
 	{% set active_tab = 'add-vendor-po' %}{% include 'ap-tabs.html' %}
-    <div id="liveAlertVendorPOExists"
+    <div id="liveAlertVendorPOExists"></div>
     <div id="liveAlertPlaceholder"></div>
     <div class="container">
     <div class="card mt-3">
         <div class="card-header">Add Vendor PO</div>
         <div class="card-body">
-{#            TODO: Add placeholders in the input fields#}
             <form action=""
                   hx-post="/ap/add-vendor-po/{{ project.id }}"
                   hx-target="this"

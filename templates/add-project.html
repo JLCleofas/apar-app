@@ -90,8 +90,8 @@
         }
 
         document.body.addEventListener('htmx:beforeSwap', function (evt) {
-            // Check if the response status is 403 (Forbidden)
-            if (evt.detail.xhr.status === 403) {
+            // Check if the response status is 409 (Forbidden)
+            if (evt.detail.xhr.status === 409) {
                 // Stop HTMX from trying to swap any content
                 evt.detail.shouldSwap = false;
                 // Trigger the alert
