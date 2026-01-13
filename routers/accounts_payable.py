@@ -172,7 +172,6 @@ async def add_project(
 # TODO: Add error handling for invoices that exceed PO amount
 # TODO: Add error handling for negative invoice amounts
 # TODO: Add error handling for zero invoice amounts
-# TODO: Add error handling for Vendor POs that exceeds Total PO amount
 # TODO: Add error handling for isDeleted column
 
 @router.post("/add-vendor-po/{project_id}", status_code=status.HTTP_201_CREATED)
@@ -231,6 +230,11 @@ async def add_invoice(db: db_dependency,
         "invoice_amount": invoice_amount,
         "currency": currency
     }
+
+    existing_invoice = db.query(Invoice).filter(Invoice.project_id == project_id).filter(Invoice.invoice_number == invoice_number).first()
+    if existing_invoice:
+        raise HTTPException(status_code=409, detail="Invoice already exists")
+
     invoice_model = Invoice(**invoice_data)
     db.add(invoice_model)
     db.commit()
