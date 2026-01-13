@@ -182,7 +182,7 @@ async def add_vendor_po(response: Response,
                         vendor: str = Form(...),
                         po_amount: Decimal = Form(...),
                         ):
-    currency = db.query(APProject).filter(APProject.id == project_id).first().currency
+    currency = db.query(APProject).filter(APProject.id == project_id).filter(APProject.is_deleted == False).first().currency
     vendor_po_data = {
         "project_id": project_id,
         "vendor_po": vendor_po,
@@ -222,7 +222,7 @@ async def add_invoice(response: Response,
                       invoice_number: str = Form(...),
                       invoice_amount: Decimal = Form(Decimal("0"))
                       ):
-    currency = db.query(APProject).filter(APProject.id == project_id).first().currency
+    currency = db.query(APProject).filter(APProject.id == project_id).filter(APProject.is_deleted == False).first().currency
     invoice_data = {
         "project_id": project_id,
         "vendor_po_id": vendor_po_id,
@@ -232,7 +232,7 @@ async def add_invoice(response: Response,
         "currency": currency
     }
 
-    existing_invoice = db.query(Invoice).filter(Invoice.project_id == project_id).filter(Invoice.invoice_number == invoice_number).first()
+    existing_invoice = db.query(Invoice).filter(Invoice.project_id == project_id).filter(Invoice.invoice_number == invoice_number).filter(Invoice.is_deleted == False).first()
     if existing_invoice:
         raise HTTPException(status_code=409, detail="Invoice already exists")
 
@@ -263,7 +263,7 @@ async def add_transaction(response: Response,
         raise HTTPException(status_code=404, detail='Project not found')
 
 
-    vendor_po_id = db.query(POToVendor).filter(POToVendor.project_id == project_id).first().id
+    vendor_po_id = db.query(POToVendor).filter(POToVendor.project_id == project_id).filter(POToVendor.is_deleted == False).first().id
 
     transaction_data = {
         "transaction_amount": transaction_amount,
