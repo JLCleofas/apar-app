@@ -195,11 +195,16 @@ async def add_vendor_po(response: Response,
 
     existing_vendor_po = db.query(POToVendor).filter(POToVendor.vendor_po == vendor_po).filter(POToVendor.is_deleted == False).first()
 
+    total_project_balance = db.query(APProject).filter(APProject.id == project_id).filter(APProject.is_deleted == False).first().balance
+
     if existing_vendor_po:
         raise HTTPException(status_code=409, detail="Vendor already exists")
 
     if po_amount <= 0:
         raise HTTPException(status_code=422, detail="PO amount must be greater than 0")
+
+    if po_amount > total_project_balance:
+        raise HTTPException(status_code=422, detail="PO amount is more than the balance")
 
     vendor_po_model = POToVendor(**vendor_po_data)
     db.add(vendor_po_model)
