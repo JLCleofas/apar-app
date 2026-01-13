@@ -214,7 +214,8 @@ async def add_vendor_po(response: Response,
 
 
 @router.post("/record-invoice/{project_id}", status_code=status.HTTP_201_CREATED)
-async def add_invoice(db: db_dependency,
+async def add_invoice(response: Response,
+                      db: db_dependency,
                       project_id: int,
                       vendor_po_id: str = Form(...),
                       invoice_type: str = Form(...),
@@ -238,6 +239,8 @@ async def add_invoice(db: db_dependency,
     invoice_model = Invoice(**invoice_data)
     db.add(invoice_model)
     db.commit()
+
+    response.headers["HX-Redirect"] = f"/ap/details/{project_id}"
 
 
 # TODO: Add error handling for negative transaction amounts
