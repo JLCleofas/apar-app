@@ -169,9 +169,6 @@ async def add_project(
     return None
 
 
-# TODO: Add error handling for invoices that exceed PO amount
-# TODO: Add error handling for negative invoice amounts
-# TODO: Add error handling for zero invoice amounts
 # TODO: Add error handling for isDeleted column
 
 @router.post("/add-vendor-po/{project_id}", status_code=status.HTTP_201_CREATED)
@@ -212,6 +209,9 @@ async def add_vendor_po(response: Response,
     response.headers["HX-Redirect"] = f"/ap/details/{project_id}"
     return None
 
+# TODO: Add error handling for invoices that exceed PO amount
+# TODO: Add error handling for negative invoice amounts
+# TODO: Add error handling for zero invoice amounts
 
 @router.post("/record-invoice/{project_id}", status_code=status.HTTP_201_CREATED)
 async def add_invoice(response: Response,
@@ -233,8 +233,13 @@ async def add_invoice(response: Response,
     }
 
     existing_invoice = db.query(Invoice).filter(Invoice.project_id == project_id).filter(Invoice.invoice_number == invoice_number).filter(Invoice.is_deleted == False).first()
+    total_po_balance = db.query(POToVendor).filter(POToVendor.project_id == project_id).filter(POToVendor.id == vendor_po_id).filter(POToVendor.is_deleted == False).first().balance
+
     if existing_invoice:
         raise HTTPException(status_code=409, detail="Invoice already exists")
+
+    if invoice_amount > total_po_balance:
+        raise HTTPException(status_code=422, detail="Invoice amount is more than the balance")
 
     invoice_model = Invoice(**invoice_data)
     db.add(invoice_model)
