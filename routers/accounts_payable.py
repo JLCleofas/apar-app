@@ -232,7 +232,7 @@ async def add_invoice(response: Response,
         "currency": currency
     }
 
-    existing_invoice = db.query(Invoice).filter(Invoice.project_id == project_id).filter(Invoice.invoice_number == invoice_number).filter(Invoice.is_deleted == False).first()
+    existing_invoice = db.query(Invoice).filter(Invoice.project_id == project_id).filter(Invoice.vendor_po_id == vendor_po_id).filter(Invoice.invoice_number == invoice_number).filter(Invoice.is_deleted == False).first()
     total_po_balance = db.query(POToVendor).filter(POToVendor.project_id == project_id).filter(POToVendor.id == vendor_po_id).filter(POToVendor.is_deleted == False).first().balance
 
     if existing_invoice:
