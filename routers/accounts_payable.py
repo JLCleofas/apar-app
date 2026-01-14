@@ -238,6 +238,9 @@ async def add_invoice(response: Response,
     if existing_invoice:
         raise HTTPException(status_code=409, detail="Invoice already exists")
 
+    if invoice_amount <= 0:
+        raise HTTPException(status_code=422, detail="Invoice amount must be greater than 0")
+
     if invoice_amount > total_po_balance:
         raise HTTPException(status_code=422, detail="Invoice amount is more than the balance")
 
