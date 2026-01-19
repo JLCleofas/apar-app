@@ -9,8 +9,8 @@ class BaseModel(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     is_deleted = Column(Boolean, default=False)
-    # created_at = Column(Date, default=None)
-    # updated_at = Column(Date, default=None)
+    created_at = Column(Date, default=None)
+    updated_at = Column(Date, default=None)
 
 class APProject(BaseModel):
     __tablename__  = 'ap_projects'
