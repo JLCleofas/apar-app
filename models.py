@@ -9,7 +9,6 @@ class BaseModel(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     is_deleted = Column(Boolean, default=False)
-    is_paid = Column(Boolean, default=False)
     # created_at = Column(Date, default=None)
     # updated_at = Column(Date, default=None)
 
@@ -23,6 +22,7 @@ class APProject(BaseModel):
     total_po_amount = Column(Numeric(10, 2))
     total_paid = Column(Numeric(10, 2), nullable=True)
     balance = Column(Numeric(10, 2))
+    is_paid = Column(Boolean, default=False)
 
     invoice: Mapped[list['Invoice']] = relationship(back_populates="project")
     transaction: Mapped[list['Transaction']] = relationship(back_populates="project", order_by=lambda: Transaction.date_paid)
@@ -37,6 +37,7 @@ class POToVendor(BaseModel):
     po_amount = Column(Numeric(10, 2), nullable=False)
     balance = Column(Numeric(10, 2), nullable=False)
     currency = Column(String(3), nullable=False)
+    is_paid = Column(Boolean, default=False)
 
     project: Mapped['APProject'] = relationship(back_populates="vendor_po")
     invoice: Mapped['Invoice'] = relationship(back_populates="vendor_po")
@@ -49,6 +50,7 @@ class Invoice(BaseModel):
     invoice_number = Column(String(30), nullable=True)
     invoice_amount = Column(Numeric(10, 2), nullable=False)
     currency = Column(String(3), nullable=False)
+    is_paid = Column(Boolean, default=False)
 
     project: Mapped['APProject'] = relationship(back_populates="invoice")
     transaction: Mapped[list['Transaction']] = relationship(back_populates="invoice")
