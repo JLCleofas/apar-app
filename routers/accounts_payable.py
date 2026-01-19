@@ -1,6 +1,4 @@
 from decimal import Decimal
-from locale import currency
-
 from fastapi import APIRouter, Depends, Request, HTTPException, Form, Response
 from models import APProject, Invoice, Transaction, POToVendor
 from database import SessionLocal
@@ -209,9 +207,6 @@ async def add_vendor_po(response: Response,
     response.headers["HX-Redirect"] = f"/ap/details/{project_id}"
     return None
 
-# TODO: Add error handling for invoices that exceed PO amount
-# TODO: Add error handling for negative invoice amounts
-# TODO: Add error handling for zero invoice amounts
 
 @router.post("/record-invoice/{project_id}", status_code=status.HTTP_201_CREATED)
 async def add_invoice(response: Response,
