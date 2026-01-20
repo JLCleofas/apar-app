@@ -38,8 +38,8 @@ class APProject(BaseModel):
 class POToVendor(BaseModel):
     __tablename__ = 'po_to_vendor'
     project_id: Mapped[int] = mapped_column(ForeignKey('ap_projects.id'), nullable=False)
-    created_by: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
-    modified_by: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
+    created_by_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
+    modified_by_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
 
     vendor_po: Mapped[str] = mapped_column(String(14), nullable=False, unique=True)
     vendor: Mapped[str] = mapped_column(String(50), nullable=False)
@@ -51,14 +51,15 @@ class POToVendor(BaseModel):
     project: Mapped['APProject'] = relationship(back_populates="vendor_po")
     invoice: Mapped['Invoice'] = relationship(back_populates="vendor_po")
     transaction: Mapped[list['Transaction']] = relationship(back_populates="vendor_po")
-    user: Mapped['User'] = relationship(back_populates="vendor_po")
+    creator: Mapped['User'] = relationship("User", foreign_keys=[created_by_id])
+    modifier: Mapped['User'] = relationship("User", foreign_keys=[modified_by_id])
 
 class Invoice(BaseModel):
     __tablename__ = 'invoices'
     project_id: Mapped[int] = mapped_column(ForeignKey('ap_projects.id'), nullable=False)
     vendor_po_id: Mapped[int] = mapped_column(ForeignKey('po_to_vendor.id'), nullable=True)
-    created_by: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
-    modified_by: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False
+    created_by_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
+    modified_by_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False
                                              )
     invoice_type: Mapped[str] = mapped_column(String(20), nullable=True)
     invoice_number: Mapped[str] = mapped_column(String(30), nullable=True)
@@ -69,7 +70,8 @@ class Invoice(BaseModel):
     project: Mapped['APProject'] = relationship(back_populates="invoice")
     transaction: Mapped[list['Transaction']] = relationship(back_populates="invoice")
     vendor_po: Mapped['POToVendor'] = relationship(back_populates="invoice")
-    user: Mapped['User'] = relationship(back_populates="invoice")
+    creator: Mapped['User'] = relationship("User", foreign_keys=[created_by_id])
+    modifier: Mapped['User'] = relationship("User", foreign_keys=[modified_by_id])
 
 class Transaction(BaseModel):
     __tablename__ = 'transactions'
@@ -77,7 +79,7 @@ class Transaction(BaseModel):
     project_id: Mapped[int] = mapped_column(ForeignKey('ap_projects.id'), nullable=False)
     invoice_id: Mapped[int] = mapped_column(ForeignKey('invoices.id'), nullable=False)
     vendor_po_id: Mapped[int] = mapped_column(ForeignKey('po_to_vendor.id'), nullable=True)
-    created_by: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
+    created_by_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
 
     transaction_amount: Mapped[float] = mapped_column(Numeric(10, 2), nullable=False)
     date_paid: Mapped[datetime] = mapped_column(DateTime, nullable=False)
@@ -86,7 +88,7 @@ class Transaction(BaseModel):
     invoice: Mapped['Invoice'] = relationship(back_populates="transaction")
     project: Mapped['APProject'] = relationship(back_populates="transaction")
     vendor_po: Mapped['POToVendor'] = relationship(back_populates="transaction")
-    user: Mapped['User'] = relationship(back_populates="transaction")
+    creator: Mapped['User'] = relationship("User", foreign_keys=[created_by_id])
 
 
 class User(BaseModel):
