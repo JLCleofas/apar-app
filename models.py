@@ -17,8 +17,8 @@ class BaseModel(Base):
 class APProject(BaseModel):
     __tablename__  = 'ap_projects'
 
-    created_by: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
-    modified_by: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
+    created_by_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
+    modified_by_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
 
     client: Mapped[str] = mapped_column(String(100), nullable=False)
     quotation: Mapped[str] = mapped_column(String(20), index=True)
@@ -32,7 +32,8 @@ class APProject(BaseModel):
     invoice: Mapped[list['Invoice']] = relationship(back_populates="project")
     transaction: Mapped[list['Transaction']] = relationship(back_populates="project", order_by=lambda: Transaction.date_paid)
     vendor_po: Mapped[list['POToVendor']] = relationship(back_populates="project")
-    user: Mapped['User'] = relationship(back_populates="project")
+    creator: Mapped['User'] = relationship("User", foreign_keys=[created_by_id])
+    modifier: Mapped['User'] = relationship("User", foreign_keys=[modified_by_id])
 
 class POToVendor(BaseModel):
     __tablename__ = 'po_to_vendor'
