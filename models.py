@@ -69,3 +69,21 @@ class Transaction(BaseModel):
     invoice: Mapped['Invoice'] = relationship(back_populates="transaction")
     project: Mapped['APProject'] = relationship(back_populates="transaction")
     vendor_po: Mapped['POToVendor'] = relationship(back_populates="transaction")
+    user: Mapped['User'] = relationship(back_populates="transaction")
+
+
+class User(BaseModel):
+    __tablename__ = 'users'
+    username: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+    email: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+    first_name: Mapped[str] = mapped_column(String(50), nullable=False)
+    last_name: Mapped[str] = mapped_column(String(50), nullable=False)
+    hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    role: Mapped[str] = mapped_column(String(50), nullable=False)
+    team: Mapped[str] = mapped_column(String(50), nullable=False)
+
+    invoice: Mapped['Invoice'] = relationship(back_populates="user")
+    project: Mapped['APProject'] = relationship(back_populates="user")
+    vendor_po: Mapped['POToVendor'] = relationship(back_populates="user")
+    transaction: Mapped['Transaction'] = relationship(back_populates="user")
