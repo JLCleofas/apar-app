@@ -5,6 +5,7 @@ from sqlalchemy.sql import func
 from datetime import datetime
 
 
+
 class BaseModel(Base):
     __abstract__ = True
     __allow_unmapped__ = True
@@ -102,7 +103,10 @@ class User(BaseModel):
     role: Mapped[str] = mapped_column(String(50), nullable=False)
     team: Mapped[str] = mapped_column(String(50), nullable=False)
 
-    invoices: Mapped['Invoice'] = relationship(back_populates="user")
-    project: Mapped['APProject'] = relationship(back_populates="user")
-    vendor_po: Mapped['POToVendor'] = relationship(back_populates="user")
-    transaction: Mapped['Transaction'] = relationship(back_populates="user")
+    created_invoices: Mapped['Invoice'] = relationship(Invoice, back_populates="creator", foreign_keys=[Invoice.created_by_id])
+    modified_invoices: Mapped['Invoice'] = relationship(Invoice, back_populates="modifier", foreign_keys=[Invoice.modified_by_id])
+    created_projects: Mapped['APProject'] = relationship(APProject, back_populates="creator", foreign_keys=[APProject.created_by_id])
+    modified_projects: Mapped['APProject'] = relationship(APProject, back_populates="modifier", foreign_keys=[APProject.modified_by_id])
+    created_vendor_po: Mapped['POToVendor'] = relationship(POToVendor, back_populates="creator", foreign_keys=[POToVendor.created_by_id])
+    modified_vendor_po: Mapped['POToVendor'] = relationship(POToVendor, back_populates="modifier", foreign_keys=[POToVendor.modified_by_id])
+    transactions: Mapped['Transaction'] = relationship(Transaction, back_populates="creator", foreign_keys=[Transaction.created_by_id])
