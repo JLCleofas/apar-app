@@ -29,7 +29,7 @@ class APProject(BaseModel):
     balance: Mapped[float] = mapped_column(Numeric(10, 2))
     is_paid: Mapped[bool] = mapped_column(Boolean, default=False)
 
-    invoice: Mapped[list['Invoice']] = relationship(back_populates="project")
+    invoices: Mapped[list['Invoice']] = relationship(back_populates="project")
     transaction: Mapped[list['Transaction']] = relationship(back_populates="project", order_by=lambda: Transaction.date_paid)
     vendor_po: Mapped[list['POToVendor']] = relationship(back_populates="project")
     creator: Mapped['User'] = relationship("User", foreign_keys=[created_by_id])
@@ -49,7 +49,7 @@ class POToVendor(BaseModel):
     is_paid: Mapped[bool] = mapped_column(Boolean, default=False)
 
     project: Mapped['APProject'] = relationship(back_populates="vendor_po")
-    invoice: Mapped['Invoice'] = relationship(back_populates="vendor_po")
+    invoices: Mapped['Invoice'] = relationship(back_populates="vendor_po")
     transaction: Mapped[list['Transaction']] = relationship(back_populates="vendor_po")
     creator: Mapped['User'] = relationship("User", foreign_keys=[created_by_id])
     modifier: Mapped['User'] = relationship("User", foreign_keys=[modified_by_id])
@@ -85,7 +85,7 @@ class Transaction(BaseModel):
     date_paid: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     dv_reference: Mapped[str] = mapped_column(String(11), nullable=True)
 
-    invoice: Mapped['Invoice'] = relationship(back_populates="transaction")
+    invoices: Mapped['Invoice'] = relationship(back_populates="transaction")
     project: Mapped['APProject'] = relationship(back_populates="transaction")
     vendor_po: Mapped['POToVendor'] = relationship(back_populates="transaction")
     creator: Mapped['User'] = relationship("User", foreign_keys=[created_by_id])
@@ -102,7 +102,7 @@ class User(BaseModel):
     role: Mapped[str] = mapped_column(String(50), nullable=False)
     team: Mapped[str] = mapped_column(String(50), nullable=False)
 
-    invoice: Mapped['Invoice'] = relationship(back_populates="user")
+    invoices: Mapped['Invoice'] = relationship(back_populates="user")
     project: Mapped['APProject'] = relationship(back_populates="user")
     vendor_po: Mapped['POToVendor'] = relationship(back_populates="user")
     transaction: Mapped['Transaction'] = relationship(back_populates="user")
