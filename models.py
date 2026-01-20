@@ -67,9 +67,9 @@ class Invoice(BaseModel):
     currency: Mapped[str] = mapped_column(String(3), nullable=False)
     is_paid: Mapped[bool] = mapped_column(Boolean, default=False)
 
-    project: Mapped['APProject'] = relationship(back_populates="invoice")
-    transaction: Mapped[list['Transaction']] = relationship(back_populates="invoice")
-    vendor_po: Mapped['POToVendor'] = relationship(back_populates="invoice")
+    project: Mapped['APProject'] = relationship(back_populates="invoices")
+    transaction: Mapped[list['Transaction']] = relationship(back_populates="invoices")
+    vendor_po: Mapped['POToVendor'] = relationship(back_populates="invoices")
     creator: Mapped['User'] = relationship("User", foreign_keys=[created_by_id])
     modifier: Mapped['User'] = relationship("User", foreign_keys=[modified_by_id])
 
