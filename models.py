@@ -1,59 +1,78 @@
 from database import Base
-from sqlalchemy import Column, Integer, String, Boolean, Numeric, Date, ForeignKey
+from sqlalchemy import Integer, String, Boolean, Numeric, DateTime, ForeignKey
 from sqlalchemy.orm import relationship, Mapped, mapped_column
+from sqlalchemy.sql import func
+from datetime import datetime
+
 
 
 class BaseModel(Base):
     __abstract__ = True
     __allow_unmapped__ = True
 
-    id = Column(Integer, primary_key=True, index=True)
-    is_deleted = Column(Boolean, default=False)
-    created_at = Column(Date, default=None)
-    updated_at = Column(Date, default=None)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    is_deleted: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
 class APProject(BaseModel):
     __tablename__  = 'ap_projects'
 
-    client = Column(String(100), nullable=False)
-    quotation = Column(String(20), index=True)
-    acceptance = Column(String(14), index=True)
-    currency = Column(String(3))
-    total_po_amount = Column(Numeric(10, 2))
-    total_paid = Column(Numeric(10, 2), nullable=True)
-    balance = Column(Numeric(10, 2))
-    is_paid = Column(Boolean, default=False)
+    created_by_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
+    modified_by_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
 
-    invoice: Mapped[list['Invoice']] = relationship(back_populates="project")
+    client: Mapped[str] = mapped_column(String(100), nullable=False)
+    quotation: Mapped[str] = mapped_column(String(20), index=True)
+    acceptance: Mapped[str] = mapped_column(String(14), index=True)
+    currency: Mapped[str] = mapped_column(String(3))
+    total_po_amount: Mapped[float] = mapped_column(Numeric(10, 2))
+    total_paid: Mapped[float] = mapped_column(Numeric(10, 2), nullable=True)
+    balance: Mapped[float] = mapped_column(Numeric(10, 2))
+    is_paid: Mapped[bool] = mapped_column(Boolean, default=False)
+
+    invoices: Mapped[list['Invoice']] = relationship(back_populates="project")
     transaction: Mapped[list['Transaction']] = relationship(back_populates="project", order_by=lambda: Transaction.date_paid)
     vendor_po: Mapped[list['POToVendor']] = relationship(back_populates="project")
+    creator: Mapped['User'] = relationship("User", foreign_keys=[created_by_id])
+    modifier: Mapped['User'] = relationship("User", foreign_keys=[modified_by_id])
 
 class POToVendor(BaseModel):
     __tablename__ = 'po_to_vendor'
     project_id: Mapped[int] = mapped_column(ForeignKey('ap_projects.id'), nullable=False)
-    vendor_po = Column(String(14), nullable=False, unique=True)
-    vendor = Column(String(50), nullable=False)
-    po_amount = Column(Numeric(10, 2), nullable=False)
-    balance = Column(Numeric(10, 2), nullable=False)
-    currency = Column(String(3), nullable=False)
-    is_paid = Column(Boolean, default=False)
+    created_by_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
+    modified_by_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
+
+    vendor_po: Mapped[str] = mapped_column(String(14), nullable=False, unique=True)
+    vendor: Mapped[str] = mapped_column(String(50), nullable=False)
+    po_amount: Mapped[float] = mapped_column(Numeric(10, 2), nullable=False)
+    balance: Mapped[float] = mapped_column(Numeric(10, 2), nullable=False)
+    currency: Mapped[str] = mapped_column(String(3), nullable=False)
+    is_paid: Mapped[bool] = mapped_column(Boolean, default=False)
 
     project: Mapped['APProject'] = relationship(back_populates="vendor_po")
-    invoice: Mapped['Invoice'] = relationship(back_populates="vendor_po")
+    invoices: Mapped['Invoice'] = relationship(back_populates="vendor_po")
     transaction: Mapped[list['Transaction']] = relationship(back_populates="vendor_po")
+    creator: Mapped['User'] = relationship("User", foreign_keys=[created_by_id])
+    modifier: Mapped['User'] = relationship("User", foreign_keys=[modified_by_id])
+
 class Invoice(BaseModel):
     __tablename__ = 'invoices'
     project_id: Mapped[int] = mapped_column(ForeignKey('ap_projects.id'), nullable=False)
     vendor_po_id: Mapped[int] = mapped_column(ForeignKey('po_to_vendor.id'), nullable=True)
-    invoice_type = Column(String(20), nullable=True)
-    invoice_number = Column(String(30), nullable=True)
-    invoice_amount = Column(Numeric(10, 2), nullable=False)
-    currency = Column(String(3), nullable=False)
-    is_paid = Column(Boolean, default=False)
+    created_by_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
+    modified_by_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False
+                                             )
+    invoice_type: Mapped[str] = mapped_column(String(20), nullable=True)
+    invoice_number: Mapped[str] = mapped_column(String(30), nullable=True)
+    invoice_amount: Mapped[float] = mapped_column(Numeric(10, 2), nullable=False)
+    currency: Mapped[str] = mapped_column(String(3), nullable=False)
+    is_paid: Mapped[bool] = mapped_column(Boolean, default=False)
 
-    project: Mapped['APProject'] = relationship(back_populates="invoice")
-    transaction: Mapped[list['Transaction']] = relationship(back_populates="invoice")
-    vendor_po: Mapped['POToVendor'] = relationship(back_populates="invoice")
+    project: Mapped['APProject'] = relationship(back_populates="invoices")
+    transaction: Mapped[list['Transaction']] = relationship(back_populates="invoices")
+    vendor_po: Mapped['POToVendor'] = relationship(back_populates="invoices")
+    creator: Mapped['User'] = relationship("User", foreign_keys=[created_by_id])
+    modifier: Mapped['User'] = relationship("User", foreign_keys=[modified_by_id])
 
 class Transaction(BaseModel):
     __tablename__ = 'transactions'
@@ -61,11 +80,33 @@ class Transaction(BaseModel):
     project_id: Mapped[int] = mapped_column(ForeignKey('ap_projects.id'), nullable=False)
     invoice_id: Mapped[int] = mapped_column(ForeignKey('invoices.id'), nullable=False)
     vendor_po_id: Mapped[int] = mapped_column(ForeignKey('po_to_vendor.id'), nullable=True)
+    created_by_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
 
-    transaction_amount = Column(Numeric(10, 2), nullable=False)
-    date_paid = Column(Date, nullable=False)
-    dv_reference = Column(String(11), nullable=True)
+    transaction_amount: Mapped[float] = mapped_column(Numeric(10, 2), nullable=False)
+    date_paid: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    dv_reference: Mapped[str] = mapped_column(String(11), nullable=True)
 
-    invoice: Mapped['Invoice'] = relationship(back_populates="transaction")
+    invoices: Mapped['Invoice'] = relationship(back_populates="transaction")
     project: Mapped['APProject'] = relationship(back_populates="transaction")
     vendor_po: Mapped['POToVendor'] = relationship(back_populates="transaction")
+    creator: Mapped['User'] = relationship("User", foreign_keys=[created_by_id])
+
+
+class User(BaseModel):
+    __tablename__ = 'users'
+    username: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+    email: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+    first_name: Mapped[str] = mapped_column(String(50), nullable=False)
+    last_name: Mapped[str] = mapped_column(String(50), nullable=False)
+    hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    role: Mapped[str] = mapped_column(String(50), nullable=False)
+    team: Mapped[str] = mapped_column(String(50), nullable=False)
+
+    created_invoices: Mapped['Invoice'] = relationship(Invoice, back_populates="creator", foreign_keys=[Invoice.created_by_id])
+    modified_invoices: Mapped['Invoice'] = relationship(Invoice, back_populates="modifier", foreign_keys=[Invoice.modified_by_id])
+    created_projects: Mapped['APProject'] = relationship(APProject, back_populates="creator", foreign_keys=[APProject.created_by_id])
+    modified_projects: Mapped['APProject'] = relationship(APProject, back_populates="modifier", foreign_keys=[APProject.modified_by_id])
+    created_vendor_po: Mapped['POToVendor'] = relationship(POToVendor, back_populates="creator", foreign_keys=[POToVendor.created_by_id])
+    modified_vendor_po: Mapped['POToVendor'] = relationship(POToVendor, back_populates="modifier", foreign_keys=[POToVendor.modified_by_id])
+    transactions: Mapped['Transaction'] = relationship(Transaction, back_populates="creator", foreign_keys=[Transaction.created_by_id])
